@@ -163,7 +163,11 @@ int Game::player_input(string message)//玩家输入想要的操作
 	string cmds = "(no)"
 		"|(view [0-9]+)"
 		"|(view table)"
-		"|(buy [0-9]*)";
+		"|(buy [0-9]*)"
+		"|(buy TrainStation)"
+		"|(buy ShoppingMall)"
+		"|(buy AmusementPark)"
+		"|(buy RadioTower)";
 	regex view(cmds);//正则
 	bool complete = false;
 	while (true)
@@ -187,6 +191,58 @@ int Game::player_input(string message)//玩家输入想要的操作
 			}
 			else view_player_cards(stoi(input[1]), true);
 			cout << message << endl;
+		}
+		else if (input[0] == "buy" && input[1] == "TrainStation")
+		{
+			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[0]->get_cost())
+			{
+				this->players[this->turn]->yellow_cards[0]->active = true;//TODO:cost money(qyb)
+				return -1;
+			}
+			else
+			{
+				cout << "You cant afford that" << endl;
+				continue;
+			}
+		}
+		else if (input[0] == "buy" && input[1] == "ShoppingMall")
+		{
+			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[1]->get_cost())
+			{
+				this->players[this->turn]->yellow_cards[1]->active = true;
+				return -1;
+			}
+			else
+			{
+				cout << "You cant afford that" << endl;//TODO:cost money(qyb)
+				continue;
+			}
+		}
+		else if (input[0] == "buy" && input[1] == "AmusementPark")
+		{
+			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[2]->get_cost())
+			{
+				this->players[this->turn]->yellow_cards[2]->active = true;//TODO:cost money(qyb)
+				return -1;
+			}
+			else
+			{
+				cout << "You cant afford that" << endl;
+				continue;
+			}
+		}
+		else if (input[0] == "buy" && input[1] == "RadioTower")
+		{
+			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[3]->get_cost())
+			{
+				this->players[this->turn]->yellow_cards[3]->active = true;//TODO:cost money(qyb)
+				return -1;
+			}
+			else
+			{
+				cout << "You cant afford that" << endl;
+				continue;
+			}
 		}
 		else if (input[0] == "buy")
 		{
@@ -431,12 +487,12 @@ void Game::purple_card_check()
 void Game::buy_propery()
 {
 	cout << "Coins after cards: " << this->players[this->turn]->bank->get_coins() << endl;
-	cout << "Which property would you like to buy (n or 0-9)?" << endl;
+	cout << "Which property would you like to buy (n or 0-9 or TrainStation/ShoppingMall/AmusementPark/RadioTower)?" << endl;
 	int selection;
 	bool complete = false;
 	while (!complete)
 	{
-		selection = this->player_input("Which property would you like to buy (n or 0-9)?");//选择要买的卡号
+		selection = this->player_input("Which property would you like to buy (no or 0-9 or TrainStation/ShoppingMall/AmusementPark/RadioTower)?");//选择要买的卡号
 		cout << endl;
 		if (selection > 0)
 		{
@@ -479,7 +535,7 @@ void Game::buy_propery()
 			}
 			else if (Color::yellow == this->slot[select][0]->get_color())//黄色卡片的购买还没有写，因为黄色卡片不是从卡槽中抽取，大家开局都有黄卡，但是状态不是active
 			{
-				//TODO: Implement buying mello yello
+				//TODO: Implement buying mello yello(因为黄卡已经在玩家手上，所以这块不用做）
 			}
 			if (this->slot[select].size() == 0)
 			{
