@@ -6,52 +6,52 @@
 
 using namespace std;
 
-Game::Game() 
+Game::Game()
 {
 	this->d = new Deck();
 	this->slot_count = 0;
 	this->is_game_over = false;
 	this->turn = 0;
 	this->deal();
-	
+
 	this->create_player("Michael");
 	this->create_player("Dave");
 	this->create_player("Bob");
 	this->create_player("Jim");
 }
 
-void Game::create_player(string name)
+void Game::create_player(string name)//创造人物，并初始化发送卡片（一个WheatField，一个Bakery）
 {
-	player *p = new player();
+	player* p = new player();
 	p->bank = new Bank();
 	p->name = name;
 
-	YellowCard *c;
+	YellowCard* c;//黄色卡已经加入到人物卡包里面，但激活状态默认为false
 	c = new TrainStation(); p->yellow_cards.push_back(c);
 	c = new ShoppingMall(); p->yellow_cards.push_back(c);
 	c = new AmusementPark(); p->yellow_cards.push_back(c);
 	c = new RadioTower(); p->yellow_cards.push_back(c);
 
-	BlueCard *b;
+	BlueCard* b;
 	b = new WheatField(); p->blue_cards.push_back(b);
 
-	GreenCard *g;
+	GreenCard* g;
 	g = new Bakery(); p->green_cards.push_back(g);
 
 	players.push_back(p);
 }
 
-void Game::deal()
+void Game::deal()//从桌面发牌到卡槽，卡槽中有十种卡牌
 {
-	Card *c;
+	Card* c;
 	bool exists;
-	while (this->d->deck.size() > 0 && this->slot.size() < 10)
+	while (this->d->deck.size() > 0 && this->slot.size() < 10)//桌面上有牌，并且自身卡槽还有剩余空间（小于十种）
 	{
 		exists = false;
 		c = this->d->deck.back();
 		for (int i = 0; i < this->slot.size(); i++)
 		{
-			if ( c->get_name().compare(this->slot[i][0]->get_name()) == 0 )
+			if (c->get_name().compare(this->slot[i][0]->get_name()) == 0)//判断抽卡是否出现重复种类，若重复添加进slot[i]
 			{
 				slot[i].push_back(c);
 				exists = true;
@@ -59,7 +59,7 @@ void Game::deal()
 			}
 		}
 
-		if (!exists)
+		if (!exists)//若不重复添加进slot
 		{
 			vector<Card*> v;
 			v.push_back(c);
@@ -70,17 +70,17 @@ void Game::deal()
 	}
 }
 
-Deck* Game::get_deck()
+Deck* Game::get_deck()//获得桌面
 {
 	return this->d;
 }
 
-vector<vector<Card *>> Game::get_slot()
+vector<vector<Card*>> Game::get_slot()//获得卡槽
 {
 	return this->slot;
 }
 
-void Game::rolling_dice(int dice_count)
+void Game::rolling_dice(int dice_count)//骰子置数，一个或者两个
 {
 	this->dice1 = rand() % 6 + 1;
 	this->dice2 = 0;
@@ -92,7 +92,7 @@ void Game::rolling_dice(int dice_count)
 	this->dice = this->dice1 + this->dice2;
 }
 
-void print_card(Card *c)
+void print_card(Card* c)//打印卡片，setw限定格式
 {
 	cout << left <<
 		setw(10) << c->get_string_color() <<
@@ -114,9 +114,9 @@ void print_card_heading()
 		setw(5) << "high" << endl;
 }
 
-void Game::view_slot_cards(bool cls)
+void Game::view_slot_cards(bool cls)//打印卡槽卡片
 {
-	if (cls) system("cls");
+	if (cls) system("cls");//清屏
 	cout << left <<
 		setw(5) << "slot" <<
 		setw(5) << "qty";
@@ -131,7 +131,7 @@ void Game::view_slot_cards(bool cls)
 	cout << endl;
 }
 
-void Game::view_player_cards(int index, bool cls)
+void Game::view_player_cards(int index, bool cls)//打印玩家卡片
 {
 	if (cls) system("cls");
 	print_card_heading();
@@ -147,7 +147,7 @@ void Game::view_player_cards(int index, bool cls)
 	cout << endl;
 }
 
-vector<string> split(string str)
+vector<string> split(string str)//通过空格键分开字符串
 {
 	stringstream ss(str);
 	string item;
@@ -158,19 +158,19 @@ vector<string> split(string str)
 	return tokens;
 }
 
-int Game::player_input(string message)
+int Game::player_input(string message)//玩家输入想要的操作
 {
 	string cmds = "(no)"
 		"|(view [0-9]+)"
 		"|(view table)"
 		"|(buy [0-9]*)";
-	regex view(cmds);
+	regex view(cmds);//正则
 	bool complete = false;
 	while (true)
 	{
 		string str;
 		getline(cin, str);
-		vector<string> input = split(str);
+		vector<string> input = split(str);//通过空格分开字符串，得到input[0]，input[1]
 		if (!regex_match(str, view))
 		{
 			cout << "Unknown Command" << endl;
@@ -180,7 +180,7 @@ int Game::player_input(string message)
 		{
 			if (input[1] == "table") view_slot_cards(true);
 
-			else if (stoi(input[1]) > this->players.size() - 1)
+			else if (stoi(input[1]) > this->players.size() - 1)//stoi将string转为int
 			{
 				cout << "There is no player " << stoi(input[1]) << endl;
 				continue;
@@ -206,14 +206,14 @@ int Game::player_input(string message)
 	return 'a';
 }
 
-void Game::roll_dice()
+void Game::roll_dice()//掷骰子主程序
 {
-	system("cls");
-	this->deal();
-	this->view_slot_cards(true);
-	this->view_player_cards(this->turn, false);
-	
-	int dice_count = 1;
+	system("cls");//清屏
+	this->deal();//判断卡槽是否需要加牌（并加牌）
+	this->view_slot_cards(true);//打印卡槽卡片
+	this->view_player_cards(this->turn, false);//打印当前玩家卡片
+
+	int dice_count = 1;//默认骰子为1个
 
 	// Should be Train Station Card
 	if (this->players[this->turn]->yellow_cards[0]->active)
@@ -223,7 +223,7 @@ void Game::roll_dice()
 	}
 	this->rolling_dice(dice_count);
 
-	// Should be Radio Tower
+	// Should be Radio Tower（如果有Radio Tower，可以重新掷骰子）
 	if (this->players[this->turn]->yellow_cards[3]->active)
 	{
 		cout << "Rolled a " << this->dice << ". Reroll(y/n): ";
@@ -234,31 +234,31 @@ void Game::roll_dice()
 
 	cout << endl;
 	cout << "Player: " << this->turn << " | rolled a " << this->dice << " | Coins: " << this->players[this->turn]->bank->get_coins() << endl;
-	this->red_card_check();
+	this->red_card_check();//先进行红卡的判定
 }
 
-void Game::red_card_check()
+void Game::red_card_check()//判断是否存在红色卡片，
 {
 	int tracker = this->turn - 1;
 	if (tracker < 0) tracker = this->players.size() - 1;
 
-	while (tracker != this->turn)
+	while (tracker != this->turn)//对除自身之外其他玩家使用
 	{
 		for (int i = 0; i < this->players[tracker]->red_cards.size(); i++)
 		{
 			if (this->dice <= this->players[tracker]->red_cards[i]->get_high_roll() &&
 				this->dice >= this->players[tracker]->red_cards[i]->get_low_roll())
 			{
-				Card *c = NULL;
+				Card* c = NULL;
 				// Should be Shopping Mall
 				if (this->players[tracker]->yellow_cards[2]->active) c = this->players[tracker]->red_cards[i];
-				this->players[tracker]->red_cards[i]->action(
+				this->players[tracker]->red_cards[i]->action(////action在继承类中重新定义，执行红卡扣钱操作
 					this->players[tracker]->bank,
 					this->players[this->turn]->bank,
 					c,
 					NULL,
 					0
-					);
+				);
 			}
 			//if (this->players[i]->bank->get_coins() == 0) break;
 		}
@@ -266,9 +266,9 @@ void Game::red_card_check()
 		if (tracker < 0) tracker = this->players.size() - 1;
 
 	}
-	this->blue_card_check();
+	this->blue_card_check();//进行蓝卡的判定
 }
-void Game::blue_card_check()
+void Game::blue_card_check()//对所有有此蓝卡玩家有效
 {
 	for (int i = 0; i < this->players.size(); i++)
 	{
@@ -277,26 +277,26 @@ void Game::blue_card_check()
 			if (this->dice <= this->players[i]->blue_cards[j]->get_high_roll() &&
 				this->dice >= this->players[i]->blue_cards[j]->get_low_roll())
 			{
-				this->players[i]->blue_cards[j]->action(
+				this->players[i]->blue_cards[j]->action(//action在继承类中重新定义
 					this->players[i]->bank,
 					NULL,
 					NULL,
 					NULL,
 					0
-					);
+				);
 			}
 		}
 	}
-	this->green_card_check();
+	this->green_card_check();//进行绿卡的判定
 }
-void Game::green_card_check()
+void Game::green_card_check()//对自身有效
 {
 	for (int i = 0; i < this->players[this->turn]->green_cards.size(); i++)
 	{
 		if (this->dice <= this->players[this->turn]->green_cards[i]->get_high_roll() &&
 			this->dice >= this->players[this->turn]->green_cards[i]->get_low_roll())
 		{
-			Card *c = NULL;
+			Card* c = NULL;
 			// Should be Shopping Mall
 			if (this->players[this->turn]->yellow_cards[2]->active) c = this->players[this->turn]->red_cards[i];
 			int val = 0;
@@ -308,16 +308,16 @@ void Game::green_card_check()
 					if (icon == this->players[this->turn]->blue_cards[j]->get_icon()) val++;
 				}
 			}
-			this->players[this->turn]->green_cards[i]->action(
+			this->players[this->turn]->green_cards[i]->action(//action在继承类中重新定义
 				this->players[this->turn]->bank,
 				NULL,
 				c,
 				NULL,
 				val
-				);
+			);
 		}
 	}
-	this->purple_card_check();
+	this->purple_card_check();//进行紫卡的判定
 }
 
 // TODO: Refactor this. Especially the card swapping. It u-g-l-y
@@ -424,7 +424,7 @@ void Game::purple_card_check()
 			}
 		}
 	}
-	this->buy_propery();
+	this->buy_propery();//进入买卡操作
 }
 
 // TODO: Allow buying of property
@@ -436,15 +436,15 @@ void Game::buy_propery()
 	bool complete = false;
 	while (!complete)
 	{
-		selection = this->player_input("Which property would you like to buy (n or 0-9)?");
+		selection = this->player_input("Which property would you like to buy (n or 0-9)?");//选择要买的卡号
 		cout << endl;
 		if (selection > 0)
 		{
 			int select = selection;
-			if (Color::blue == this->slot[select][0]->get_color())
+			if (Color::blue == this->slot[select][0]->get_color())//根据颜色对卡片进行分类加入玩家手中
 			{
-				this->players[this->turn]->blue_cards.push_back((BlueCard*)this->slot[select].back());
-				this->slot[select].pop_back();
+				this->players[this->turn]->blue_cards.push_back((BlueCard*)this->slot[select].back());//将卡槽中对应卡片加入到玩家手中
+				this->slot[select].pop_back();//丢出卡槽中的卡
 				complete = true;
 			}
 			else if (Color::green == this->slot[select][0]->get_color())
@@ -477,7 +477,7 @@ void Game::buy_propery()
 					complete = true;
 				}
 			}
-			else if (Color::yellow == this->slot[select][0]->get_color())
+			else if (Color::yellow == this->slot[select][0]->get_color())//黄色卡片的购买还没有写，因为黄色卡片不是从卡槽中抽取，大家开局都有黄卡，但是状态不是active
 			{
 				//TODO: Implement buying mello yello
 			}
@@ -494,7 +494,7 @@ void Game::buy_propery()
 	this->end_of_turn();
 }
 
-void Game::end_of_turn()
+void Game::end_of_turn()//对是否结束进行判定，并且进入下一玩家回合
 {
 	this->is_game_over = true;
 	for (int i = 0; i < this->players[turn]->yellow_cards.size(); i++)
@@ -505,8 +505,8 @@ void Game::end_of_turn()
 			break;
 		}
 	}
-	if (this->is_game_over) { cout << this->turn << " wins" << endl; return; }
-	cout << "End of " << this->turn << "'s turn. Coins: " << this->players[turn]->bank->get_coins();
+	if (this->is_game_over) { cout << this->turn << " wins" << endl; return; }//判断是否获胜
+	cout << "End of " << this->turn << "'s turn. Coins: " << this->players[turn]->bank->get_coins();//打印本轮玩家所剩硬币
 	this->turn++;
 
 	// Should be Amusement Park card
@@ -515,6 +515,6 @@ void Game::end_of_turn()
 		turn--;
 	}
 	if (this->turn == players.size()) this->turn = 0;
-	cout << " | " << this->turn << "'s turn next" << endl;
+	cout << " | " << this->turn << "'s turn next" << endl;//打印下轮玩家
 	return;
 }
