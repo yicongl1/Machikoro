@@ -20,7 +20,7 @@ void view_slots(Game *g)
 int main()
 {
 	Game *g = new Game();
-
+	g->version_old = g->choose_game();
 	while (!g->is_game_over)
 	{
 		g->roll_dice();

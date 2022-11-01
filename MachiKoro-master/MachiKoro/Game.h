@@ -21,11 +21,13 @@ class Game {
 public:
 	Game();
 	int turn;
+	bool version_old;
 	bool is_game_over;
 	void deal();
 	Deck* get_deck();
 	vector<vector<Card *>> get_slot();
 	vector<player*> players;
+	bool choose_game();
 	void create_player(string name);
 	void roll_dice();
 	void red_card_check();
