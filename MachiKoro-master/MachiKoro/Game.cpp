@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <sstream>
 #include "Game.h"
-#include <regex>;
+#include <regex>
 
 using namespace std;
 
@@ -11,6 +11,7 @@ Game::Game()
 	this->d = new Deck();
 	this->slot_count = 0;
 	this->is_game_over = false;
+	this->version_old;
 	this->turn = 0;
 	this->deal();
 
@@ -18,6 +19,40 @@ Game::Game()
 	this->create_player("Dave");
 	this->create_player("Bob");
 	this->create_player("Jim");
+}
+
+vector<string> split(string str)//通过空格键分开字符串
+{
+	stringstream ss(str);
+	string item;
+	vector<string> tokens;
+	while (getline(ss, item, ' ')) {
+		tokens.push_back(item);
+	}
+	return tokens;
+}
+
+bool Game::choose_game()
+{
+	cout << "Welcome to play MachiKoro"<<endl<<endl;
+	cout << "Here are two version of this game." << endl<<endl;
+	cout << "One is origin version , the other is DLC version" << endl<<endl;
+	cout << "Which one do you want to play?(origin/dlc)" << endl;
+	string cmds = "(origin)"
+		"|(dlc)";
+	regex view(cmds);//正则
+	while (true)
+	{
+		string str;
+		getline(cin, str);
+		vector<string> input = split(str);//通过空格分开字符串，得到input[0]，input[1]
+		if (!regex_match(str, view))
+		{
+			cout << "Unknown Command" << endl;
+		}
+		else if (input[0] == "origin") return true;
+		else if (input[0] == "dlc") return false;
+	}
 }
 
 void Game::create_player(string name)//创造人物，并初始化发送卡片（一个WheatField，一个Bakery）
@@ -145,17 +180,6 @@ void Game::view_player_cards(int index, bool cls)//打印玩家卡片
 	cout << endl;
 	for (int i = 0; i < this->players[index]->yellow_cards.size(); i++) { print_card(this->players[index]->yellow_cards[i]); }
 	cout << endl;
-}
-
-vector<string> split(string str)//通过空格键分开字符串
-{
-	stringstream ss(str);
-	string item;
-	vector<string> tokens;
-	while (getline(ss, item, ' ')) {
-		tokens.push_back(item);
-	}
-	return tokens;
 }
 
 int Game::player_input(string message)//玩家输入想要的操作
