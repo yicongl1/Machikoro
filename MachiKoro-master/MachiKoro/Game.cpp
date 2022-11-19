@@ -129,13 +129,37 @@ void Game::rolling_dice(int dice_count)//骰子置数，一个或者两个
 
 void print_card(Card* c)//打印卡片，setw限定格式
 {
-	cout << left <<
-		setw(10) << c->get_string_color() <<
-		setw(25) << c->get_name() <<
-		setw(5) << c->get_cost() <<
-		setw(5) << c->get_value() <<
-		setw(5) << c->get_low_roll() <<
-		setw(5) << c->get_high_roll() << endl;
+
+	if (c->get_string_color() == "yellow")//单独设置黄卡的打印
+	{
+		YellowCard* yc = dynamic_cast<YellowCard*>(c);
+		string ifactive;
+		if (yc->active == true)
+		{
+			ifactive = "owned";
+		}
+		else
+		{
+			ifactive = "no";
+		}
+		cout << left <<
+			setw(10) << c->get_string_color() <<
+			setw(25) << c->get_name() <<
+			setw(5) << c->get_cost() <<
+			setw(5) << c->get_value() <<
+			setw(5) << c->get_low_roll() <<
+			setw(5) << c->get_high_roll() << setw(5) << ifactive << endl;
+	}
+	else
+	{
+		cout << left <<
+			setw(10) << c->get_string_color() <<
+			setw(25) << c->get_name() <<
+			setw(5) << c->get_cost() <<
+			setw(5) << c->get_value() <<
+			setw(5) << c->get_low_roll() <<
+			setw(5) << c->get_high_roll() << endl;
+	}
 }
 
 void print_card_heading()
@@ -218,6 +242,11 @@ int Game::player_input(string message)//玩家输入想要的操作
 		}
 		else if (input[0] == "buy" && input[1] == "TrainStation")
 		{
+			if (this->players[this->turn]->yellow_cards[0]->active)
+			{
+				cout << "you have owed" << endl;
+				continue;
+			}
 			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[0]->get_cost())
 			{
 				this->players[this->turn]->yellow_cards[0]->active = true;//TODO:cost money(qyb)
@@ -231,6 +260,11 @@ int Game::player_input(string message)//玩家输入想要的操作
 		}
 		else if (input[0] == "buy" && input[1] == "ShoppingMall")
 		{
+			if (this->players[this->turn]->yellow_cards[1]->active)
+			{
+				cout << "you have owed" << endl;
+				continue;
+			}
 			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[1]->get_cost())
 			{
 				this->players[this->turn]->yellow_cards[1]->active = true;
@@ -244,6 +278,11 @@ int Game::player_input(string message)//玩家输入想要的操作
 		}
 		else if (input[0] == "buy" && input[1] == "AmusementPark")
 		{
+			if (this->players[this->turn]->yellow_cards[2]->active)
+			{
+				cout << "you have owed" << endl;
+				continue;
+			}
 			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[2]->get_cost())
 			{
 				this->players[this->turn]->yellow_cards[2]->active = true;//TODO:cost money(qyb)
@@ -257,6 +296,11 @@ int Game::player_input(string message)//玩家输入想要的操作
 		}
 		else if (input[0] == "buy" && input[1] == "RadioTower")
 		{
+			if (this->players[this->turn]->yellow_cards[3]->active)
+			{
+				cout << "you have owed" << endl;
+				continue;
+			}
 			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[3]->get_cost())
 			{
 				this->players[this->turn]->yellow_cards[3]->active = true;//TODO:cost money(qyb)
