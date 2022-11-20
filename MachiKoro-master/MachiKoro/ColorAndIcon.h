@@ -13,7 +13,7 @@ enum class Icon {
 	gear,
 	bread ,
 	factory,
-	retaurant,
+	restaurant,
 	establishment,
 	boat,
 	none
