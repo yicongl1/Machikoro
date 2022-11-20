@@ -7,7 +7,8 @@
 
 using namespace std;
 
-struct player {
+class player {
+public:
 	string name;
 	Bank *bank;
 	vector<BlueCard*> blue_cards;
