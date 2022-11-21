@@ -5,6 +5,7 @@
 #include "Game.h"
 #include <regex>
 
+
 using namespace std;
 
 Game::Game()
@@ -129,6 +130,7 @@ void Game::rolling_dice(int dice_count)//骰子置数，一个或者两个
 		this->dice2 = rand() % 6 + 1;
 	}
 	this->dice = this->dice1 + this->dice2;
+
 }
 
 void print_card(Card* c)//打印卡片，setw限定格式
@@ -288,8 +290,8 @@ int Game::player_input(string message)//玩家输入想要的操作
 			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[0]->get_cost())
 			{
 				this->players[this->turn]->yellow_cards[0]->active = true;//TODO:cost money(qyb)
-				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[1]->get_cost());
-				return (this->players[this->turn]->yellow_cards[0]->get_cost());
+				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[0]->get_cost());
+				return (this->players[this->turn]->bank->get_coins());
 			}
 			else
 			{
@@ -304,11 +306,12 @@ int Game::player_input(string message)//玩家输入想要的操作
 				cout << "Vous l'avez deja" << endl;
 				continue;
 			}
-			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[1]->get_cost())
+			if (this->players[this->turn]->yellow_cards[0]->active && this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[1]->get_cost())
 			{
 				this->players[this->turn]->yellow_cards[1]->active = true;//TODO:cost money(qyb)
 				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[1]->get_cost());
-				return (this->players[this->turn]->yellow_cards[0]->get_cost());
+
+				return (this->players[this->turn]->bank->get_coins());
 			}
 			else
 			{
@@ -323,11 +326,13 @@ int Game::player_input(string message)//玩家输入想要的操作
 				cout << "Vous l'avez deja" << endl;
 				continue;
 			}
-			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[2]->get_cost())
+			if (this->players[this->turn]->yellow_cards[0]->active && this->players[this->turn]->yellow_cards[1]->active && this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[2]->get_cost())
 			{
 				this->players[this->turn]->yellow_cards[2]->active = true;//TODO:cost money(qyb)
-				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[1]->get_cost());
-				return (this->players[this->turn]->yellow_cards[0]->get_cost());
+				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[2]->get_cost());
+
+				
+				return (this->players[this->turn]->bank->get_coins());
 			}
 			else
 			{
@@ -342,11 +347,12 @@ int Game::player_input(string message)//玩家输入想要的操作
 				cout << "Vous l'avez deja" << endl;
 				continue;
 			}
-			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[3]->get_cost())
+			if (this->players[this->turn]->yellow_cards[0]->active && this->players[this->turn]->yellow_cards[1]->active && this->players[this->turn]->yellow_cards[2]->active && this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[3]->get_cost())
 			{
 				this->players[this->turn]->yellow_cards[3]->active = true;//TODO:cost money(qyb)
-				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[1]->get_cost());
-				return (this->players[this->turn]->yellow_cards[0]->get_cost());
+				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[3]->get_cost());
+
+				return (this->players[this->turn]->bank->get_coins());
 			}
 			else
 			{
@@ -366,7 +372,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 				cout << "Vous l'avez deja" << endl;
 				continue;
 			}
-			if (stoi(input[1]) < this->slot.size() && this->players[this->turn]->bank->get_coins() > this->slot[stoi(input[1])][0]->get_cost())
+			if (stoi(input[1]) < this->slot.size() && this->players[this->turn]->bank->get_coins() >= this->slot[stoi(input[1])][0]->get_cost())
 			{
 				this->players[this->turn]->bank->withdraw(this->slot[stoi(input[1])][0]->get_cost());
 			}
@@ -428,7 +434,7 @@ void Game::red_card_check()//判断是否存在红色卡片，
 				Card* c = NULL;
 				// Should be Shopping Mall
 				if (this->players[tracker]->yellow_cards[2]->active) c = this->players[tracker]->red_cards[i];
-				this->players[tracker]->red_cards[i]->action(////action在继承类中重新定义，执行红卡扣钱操作
+				this->players[tracker]->red_cards[i]->action(//action在继承类中重新定义，执行红卡扣钱操作
 					this->players[tracker]->bank,
 					this->players[this->turn]->bank,
 					c,

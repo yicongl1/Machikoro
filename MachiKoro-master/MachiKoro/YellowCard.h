@@ -11,6 +11,18 @@ public:
 private:
 };
 
+class TrainStation : public YellowCard {
+public:
+	TrainStation();
+private:
+};
+
+class ShoppingMall : public YellowCard {
+public:
+	ShoppingMall();
+private:
+};
+
 class AmusementPark : public YellowCard {
 public:
 	AmusementPark();
@@ -23,14 +35,4 @@ public:
 private:
 };
 
-class ShoppingMall : public YellowCard {
-public:
-	ShoppingMall();
-private:
-};
 
-class TrainStation : public YellowCard {
-public:
-	TrainStation();
-private:
-};

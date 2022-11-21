@@ -24,7 +24,9 @@ int Bank::withdraw(int val)
 		this->coins = 0;
 		return this->coins;
 	}
-
-	this->coins -= val;
-	return val;
+	else
+	{
+		this->coins -= val;
+		return val;
+	}
 }
