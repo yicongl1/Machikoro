@@ -235,9 +235,9 @@ int Game::player_input(string message)//玩家输入想要的操作
 	if (this->version_old)
 	{
 		cmds = "(no)"
-			"|(view [0-14]+)"
+			"|(view [0-9]+)"
 			"|(view table)"
-			"|(acheter [0-14]*)"
+			"|(acheter [0-9]*)"
 			"|(acheter TrainStation)"
 			"|(acheter ShoppingMall)"
 			"|(acheter AmusementPark)"
@@ -336,7 +336,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 			}
 			else
 			{
-				cout << "Vous l'avez deja" << endl;
+				cout << "You can't afford that" << endl;
 				continue;
 			}
 		}
@@ -369,7 +369,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 			}
 			if (this->players[this->turn]->bank->get_coins() < this->slot[stoi(input[1])][0]->get_cost())
 			{
-				cout << "Vous l'avez deja" << endl;
+				cout << "You can't afford that" << endl;
 				continue;
 			}
 			if (stoi(input[1]) < this->slot.size() && this->players[this->turn]->bank->get_coins() >= this->slot[stoi(input[1])][0]->get_cost())
