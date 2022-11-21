@@ -258,7 +258,8 @@ int Game::player_input(string message)//玩家输入想要的操作
 			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[0]->get_cost())
 			{
 				this->players[this->turn]->yellow_cards[0]->active = true;//TODO:cost money(qyb)
-				return -1;
+				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[1]->get_cost());
+				return (this->players[this->turn]->yellow_cards[0]->get_cost());
 			}
 			else
 			{
@@ -275,12 +276,13 @@ int Game::player_input(string message)//玩家输入想要的操作
 			}
 			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[1]->get_cost())
 			{
-				this->players[this->turn]->yellow_cards[1]->active = true;
-				return -1;
+				this->players[this->turn]->yellow_cards[1]->active = true;//TODO:cost money(qyb)
+				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[1]->get_cost());
+				return (this->players[this->turn]->yellow_cards[0]->get_cost());
 			}
 			else
 			{
-				cout << "You cant afford that" << endl;//TODO:cost money(qyb)
+				cout << "You cant afford that" << endl;
 				continue;
 			}
 		}
@@ -294,7 +296,8 @@ int Game::player_input(string message)//玩家输入想要的操作
 			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[2]->get_cost())
 			{
 				this->players[this->turn]->yellow_cards[2]->active = true;//TODO:cost money(qyb)
-				return -1;
+				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[1]->get_cost());
+				return (this->players[this->turn]->yellow_cards[0]->get_cost());
 			}
 			else
 			{
@@ -312,7 +315,8 @@ int Game::player_input(string message)//玩家输入想要的操作
 			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[3]->get_cost())
 			{
 				this->players[this->turn]->yellow_cards[3]->active = true;//TODO:cost money(qyb)
-				return -1;
+				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[1]->get_cost());
+				return (this->players[this->turn]->yellow_cards[0]->get_cost());
 			}
 			else
 			{
@@ -331,6 +335,10 @@ int Game::player_input(string message)//玩家输入想要的操作
 			{
 				cout << "You cant afford that" << endl;
 				continue;
+			}
+			if (stoi(input[1]) < this->slot.size() && this->players[this->turn]->bank->get_coins() > this->slot[stoi(input[1])][0]->get_cost())
+			{
+				this->players[this->turn]->bank->withdraw(this->slot[stoi(input[1])][0]->get_cost());
 			}
 			return stoi(input[1]);
 		}
