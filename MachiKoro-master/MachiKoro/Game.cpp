@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include <iomanip>
+#include <string>
 #include <sstream>
 #include "Game.h"
 #include <regex>
@@ -16,9 +17,9 @@ Game::Game()
 	this->turn = 0;
 	this->deal();
 
-	this->create_player("Michael");
+	this->create_player("Michael",true);
 	this->create_player("Dave");
-	this->create_player("Bob");
+	this->create_player("Bob",true);
 	this->create_player("Jim");
 }
 
@@ -56,11 +57,12 @@ bool Game::choose_game()
 	}
 }
 
-void Game::create_player(string name)//创造人物，并初始化发送卡片（一个WheatField，一个Bakery）
+void Game::create_player(string name, bool bot)//创造人物，并初始化发送卡片（一个WheatField，一个Bakery）
 {
 	player* p = new player();
 	p->bank = new Bank();
 	p->name = name;
+	p->isBot = bot;
 
 	YellowCard* c;//黄色卡已经加入到人物卡包里面，但激活状态默认为false
 	c = new TrainStation(); p->yellow_cards.push_back(c);
@@ -81,7 +83,9 @@ void Game::deal()//从桌面发牌到卡槽，卡槽中有十种卡牌
 {
 	Card* c;
 	bool exists;
-	while (this->d->deck.size() > 0 && this->slot.size() < 10)//桌面上有牌，并且自身卡槽还有剩余空间（小于十种）
+	int slotnum = 10;
+	if (this->version_old) slotnum = 16;
+	while (this->d->deck.size() > 0 && this->slot.size() < slotnum)//桌面上有牌，并且自身卡槽还有剩余空间（小于十种）
 	{
 		exists = false;
 		c = this->d->deck.back();
@@ -226,12 +230,38 @@ int Game::player_input(string message)//玩家输入想要的操作
 		"|(acheter ShoppingMall)"
 		"|(acheter AmusementPark)"
 		"|(acheter RadioTower)";
+	bool isRound1 = true;//用于计算AI购买次数
+	int slotnum = 9;
+	if (this->version_old)
+	{
+		cmds = "(no)"
+			"|(view [0-14]+)"
+			"|(view table)"
+			"|(acheter [0-14]*)"
+			"|(acheter TrainStation)"
+			"|(acheter ShoppingMall)"
+			"|(acheter AmusementPark)"
+			"|(acheter RadioTower)";
+		slotnum = 14;
+	}
 	regex view(cmds);//正则
 	bool complete = false;
 	while (true)
 	{
 		string str;
-		getline(cin, str);
+		if (this->players[this->turn]->isBot)
+		{
+			if (isRound1)
+			{
+				str = "acheter ";
+				srand(time(0));
+				str += to_string(rand() % slotnum);
+				cout << str<<endl;
+			}
+			else str = "no";
+		}
+		else getline(cin, str);
+		isRound1 = false;
 		vector<string> input = split(str);//通过空格分开字符串，得到input[0]，input[1]
 		if (!regex_match(str, view))
 		{
@@ -254,7 +284,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 		{
 			if (this->players[this->turn]->yellow_cards[0]->active)
 			{
-				cout << "you have owed" << endl;
+				cout << "Vous l'avez deja" << endl;
 				continue;
 			}
 			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[0]->get_cost())
@@ -265,7 +295,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 			}
 			else
 			{
-				cout << "You cant afford that" << endl;
+				cout << "You can't afford that" << endl;
 				continue;
 			}
 		}
@@ -273,7 +303,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 		{
 			if (this->players[this->turn]->yellow_cards[1]->active)
 			{
-				cout << "you have owed" << endl;
+				cout << "Vous l'avez deja" << endl;
 				continue;
 			}
 			if (this->players[this->turn]->yellow_cards[0]->active && this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[1]->get_cost())
@@ -293,7 +323,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 		{
 			if (this->players[this->turn]->yellow_cards[2]->active)
 			{
-				cout << "you have owed" << endl;
+				cout << "Vous l'avez deja" << endl;
 				continue;
 			}
 			if (this->players[this->turn]->yellow_cards[0]->active && this->players[this->turn]->yellow_cards[1]->active && this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[2]->get_cost())
@@ -306,7 +336,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 			}
 			else
 			{
-				cout << "You cant afford that" << endl;
+				cout << "Vous l'avez deja" << endl;
 				continue;
 			}
 		}
@@ -314,7 +344,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 		{
 			if (this->players[this->turn]->yellow_cards[3]->active)
 			{
-				cout << "you have owed" << endl;
+				cout << "Vous l'avez deja" << endl;
 				continue;
 			}
 			if (this->players[this->turn]->yellow_cards[0]->active && this->players[this->turn]->yellow_cards[1]->active && this->players[this->turn]->yellow_cards[2]->active && this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[3]->get_cost())
@@ -326,7 +356,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 			}
 			else
 			{
-				cout << "You cant afford that" << endl;
+				cout << "You can't afford that" << endl;
 				continue;
 			}
 		}
@@ -339,7 +369,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 			}
 			if (this->players[this->turn]->bank->get_coins() < this->slot[stoi(input[1])][0]->get_cost())
 			{
-				cout << "You cant afford that" << endl;
+				cout << "Vous l'avez deja" << endl;
 				continue;
 			}
 			if (stoi(input[1]) < this->slot.size() && this->players[this->turn]->bank->get_coins() >= this->slot[stoi(input[1])][0]->get_cost())
