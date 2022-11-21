@@ -9,6 +9,7 @@ using namespace std;
 
 class player {
 public:
+	bool isBot;
 	string name;
 	Bank *bank;
 	vector<BlueCard*> blue_cards;
@@ -29,7 +30,7 @@ public:
 	vector<vector<Card *>> get_slot();
 	vector<player*> players;
 	bool choose_game();
-	void create_player(string name);
+	void create_player(string name, bool bot=false);
 	void roll_dice();
 	void red_card_check();
 	void blue_card_check();
