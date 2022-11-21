@@ -364,8 +364,26 @@ void Game::roll_dice()//掷骰子主程序
 	// Should be Train Station Card
 	if (this->players[this->turn]->yellow_cards[0]->active)
 	{
+		string d;
+		bool s=true;
 		cout << "1 or 2 dice: ";
-		cin >> dice_count;
+		string cmds = "(1)"
+			"|(2)";
+		regex view(cmds);//正则
+		while (s)
+		{
+			string str;
+			getline(cin, str);
+			vector<string> input = split(str);//通过空格分开字符串，得到input[0]，input[1]
+			if (!regex_match(str, view))
+			{
+				cout << "Unknown Command" << endl;
+			}
+			else if (input[0] == "1") { dice_count = atoi(str.c_str()); s= false; }
+			else if (input[0] == "2") { dice_count = atoi(str.c_str()); s = false; }
+			else
+				s= true;
+		}
 	}
 	this->rolling_dice(dice_count);
 
