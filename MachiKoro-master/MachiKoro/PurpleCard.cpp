@@ -17,7 +17,7 @@ void Stadium::action(Bank *p1, Bank *p2, Card *c1, Card *c2, int val) {
 }
 
 TVStation::TVStation() {
-	this->set_card("TVStation", 7, 5, 6, 6, Icon::retaurant, Color::purple);
+	this->set_card("TVStation", 7, 5, 6, 6, Icon::restaurant, Color::purple);
 }
 void TVStation::action(Bank *p1, Bank *p2, Card *c1, Card *c2, int val) {
 	p1->deposit(p2->withdraw(this->get_value()));

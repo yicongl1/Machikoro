@@ -176,6 +176,10 @@ void print_card_heading()
 void Game::view_slot_cards(bool cls)//打印卡槽卡片
 {
 	if (cls) system("cls");//清屏
+	for (int i = 0; i < 25; i++)cout << "-";
+	cout << "CARTES SUR TABLE";
+	for (int i = 0; i < 25; i++)cout << "-";
+	cout << "\n\n";
 	cout << left <<
 		setw(5) << "slot" <<
 		setw(5) << "qty";
@@ -193,6 +197,10 @@ void Game::view_slot_cards(bool cls)//打印卡槽卡片
 void Game::view_player_cards(int index, bool cls)//打印玩家卡片
 {
 	if (cls) system("cls");
+	for (int i = 0; i < 25; i++)cout << "-";
+	cout << "CARTES DE JOUEUR";
+	for (int i = 0; i < 25; i++)cout << "-";
+	cout << "\n\n";
 	print_card_heading();
 	for (int i = 0; i < this->players[index]->blue_cards.size(); i++) { print_card(this->players[index]->blue_cards[i]); }
 	cout << endl;
@@ -211,11 +219,11 @@ int Game::player_input(string message)//玩家输入想要的操作
 	string cmds = "(no)"
 		"|(view [0-9]+)"
 		"|(view table)"
-		"|(buy [0-9]*)"
-		"|(buy TrainStation)"
-		"|(buy ShoppingMall)"
-		"|(buy AmusementPark)"
-		"|(buy RadioTower)";
+		"|(acheter [0-9]*)"
+		"|(acheter TrainStation)"
+		"|(acheter ShoppingMall)"
+		"|(acheter AmusementPark)"
+		"|(acheter RadioTower)";
 	regex view(cmds);//正则
 	bool complete = false;
 	while (true)
@@ -225,7 +233,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 		vector<string> input = split(str);//通过空格分开字符串，得到input[0]，input[1]
 		if (!regex_match(str, view))
 		{
-			cout << "Unknown Command" << endl;
+			cout << "Commande non valide" << endl;
 		}
 		else if (input[0] == "no") return -1;
 		else if (input[0] == "view")
@@ -240,7 +248,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 			else view_player_cards(stoi(input[1]), true);
 			cout << message << endl;
 		}
-		else if (input[0] == "buy" && input[1] == "TrainStation")
+		else if (input[0] == "acheter" && input[1] == "TrainStation")
 		{
 			if (this->players[this->turn]->yellow_cards[0]->active)
 			{
@@ -258,7 +266,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 				continue;
 			}
 		}
-		else if (input[0] == "buy" && input[1] == "ShoppingMall")
+		else if (input[0] == "acheter" && input[1] == "ShoppingMall")
 		{
 			if (this->players[this->turn]->yellow_cards[1]->active)
 			{
@@ -276,7 +284,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 				continue;
 			}
 		}
-		else if (input[0] == "buy" && input[1] == "AmusementPark")
+		else if (input[0] == "acheter" && input[1] == "AmusementPark")
 		{
 			if (this->players[this->turn]->yellow_cards[2]->active)
 			{
@@ -294,7 +302,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 				continue;
 			}
 		}
-		else if (input[0] == "buy" && input[1] == "RadioTower")
+		else if (input[0] == "acheter" && input[1] == "RadioTower")
 		{
 			if (this->players[this->turn]->yellow_cards[3]->active)
 			{
@@ -312,7 +320,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 				continue;
 			}
 		}
-		else if (input[0] == "buy")
+		else if (input[0] == "acheter")
 		{
 			if (stoi(input[1]) > this->slot.size())
 			{
@@ -357,7 +365,13 @@ void Game::roll_dice()//掷骰子主程序
 	}
 
 	cout << endl;
-	cout << "Player: " << this->turn << " | rolled a " << this->dice << " | Coins: " << this->players[this->turn]->bank->get_coins() << endl;
+	for (int i = 0; i < 25; i++)cout << "-";
+	cout << "STATUT DU JOUEUR";
+	for (int i = 0; i < 25; i++)cout << "-";
+	cout << "\n\n";
+	cout << "Joueur: " << this->turn << endl <<
+		"Roulé un: " << this->dice << endl << 
+		"Pièces de pré-règlement: " << this->players[this->turn]->bank->get_coins() << endl;
 	this->red_card_check();//先进行红卡的判定
 }
 
@@ -554,13 +568,15 @@ void Game::purple_card_check()
 // TODO: Allow buying of property
 void Game::buy_propery()
 {
-	cout << "Coins after cards: " << this->players[this->turn]->bank->get_coins() << endl;
-	cout << "Which property would you like to buy (n or 0-9 or TrainStation/ShoppingMall/AmusementPark/RadioTower)?" << endl;
+	cout << "Pièces après règlement: " << this->players[this->turn]->bank->get_coins() << endl;
+	for (int i = 0; i < 70; i++)cout << "-";
+	cout << "\n\n";
+	cout << "Lequel voulez-vous acheter (no or 0-9 or TrainStation/ShoppingMall/AmusementPark/RadioTower)?" << endl;
 	int selection;
 	bool complete = false;
 	while (!complete)
 	{
-		selection = this->player_input("Which property would you like to buy (no or 0-9 or TrainStation/ShoppingMall/AmusementPark/RadioTower)?");//选择要买的卡号
+		selection = this->player_input("Lequel voulez-vous acheter (no or 0-9 or TrainStation/ShoppingMall/AmusementPark/RadioTower)?");//选择要买的卡号
 		cout << endl;
 		if (selection > 0)
 		{
@@ -629,8 +645,12 @@ void Game::end_of_turn()//对是否结束进行判定，并且进入下一玩家回合
 			break;
 		}
 	}
+	for (int i = 0; i < 25; i++)cout << "-";
+	cout << "REGLEMENT ROND";
+	for (int i = 0; i < 25; i++)cout << "-";
+	cout << "\n\n";
 	if (this->is_game_over) { cout << this->turn << " wins" << endl; return; }//判断是否获胜
-	cout << "End of " << this->turn << "'s turn. Coins: " << this->players[turn]->bank->get_coins();//打印本轮玩家所剩硬币
+	cout << "Fin du tour de " << this->turn << endl<< "Pièces après l’achat: " << this->players[turn]->bank->get_coins();//打印本轮玩家所剩硬币
 	this->turn++;
 
 	// Should be Amusement Park card
@@ -639,6 +659,6 @@ void Game::end_of_turn()//对是否结束进行判定，并且进入下一玩家回合
 		turn--;
 	}
 	if (this->turn == players.size()) this->turn = 0;
-	cout << " | " << this->turn << "'s turn next" << endl;//打印下轮玩家
+	cout << endl << "Tour de "<<this->turn << " après" << endl;//打印下轮玩家
 	return;
 }
