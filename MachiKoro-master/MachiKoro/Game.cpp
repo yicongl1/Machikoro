@@ -36,9 +36,9 @@ vector<string> split(string str)//通过空格键分开字符串
 
 bool Game::choose_game()
 {
-	cout << "Welcome to play MachiKoro"<<endl<<endl;
+	cout << "Welcome to MachiKoro"<<endl<<endl;
 	cout << "Here are two version of this game." << endl<<endl;
-	cout << "One is origin version , the other is DLC version" << endl<<endl;
+	cout << "One is ORIGIN version , the other is DLC version" << endl<<endl;
 	cout << "Which one do you want to play?(origin/dlc)" << endl;
 	string cmds = "(origin)"
 		"|(dlc)";
@@ -232,18 +232,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 		"|(acheter RadioTower)";
 	bool isRound1 = true;//用于计算AI购买次数
 	int slotnum = 9;
-	if (this->version_old)
-	{
-		cmds = "(no)"
-			"|(view [0-9]+)"
-			"|(view table)"
-			"|(acheter [0-9]*)"
-			"|(acheter TrainStation)"
-			"|(acheter ShoppingMall)"
-			"|(acheter AmusementPark)"
-			"|(acheter RadioTower)";
-		slotnum = 14;
-	}
+	if (this->version_old)	slotnum = 14;
 	regex view(cmds);//正则
 	bool complete = false;
 	while (true)
