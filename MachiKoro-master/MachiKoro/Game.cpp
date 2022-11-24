@@ -5,7 +5,7 @@
 #include "Game.h"
 #include <regex>
 
-
+Game* Game::instance = NULL;
 using namespace std;
 
 Game::Game()
@@ -208,15 +208,20 @@ void Game::view_player_cards(int index, bool cls)//´òÓ¡Íæ¼Ò¿¨Æ¬
 	for (int i = 0; i < 25; i++)cout << "-";
 	cout << "\n\n";
 	print_card_heading();
-	for (auto it = this->players[index]->blue_cards.begin(); it != this->players[index]->blue_cards.end(); it++) { print_card(*it); }
+	for (auto it = this->players[index]->blue_cards.begin(); it != this->players[index]->blue_cards.end(); it++) 
+		print_card(*it);
 	cout << endl;
-	for (auto it = this->players[index]->green_cards.begin(); it != this->players[index]->green_cards.end(); it++) { print_card(*it); }
+	for (auto it = this->players[index]->green_cards.begin(); it != this->players[index]->green_cards.end(); it++) 
+		print_card(*it); 
 	cout << endl;
-	for (auto it = this->players[index]->red_cards.begin(); it != this->players[index]->red_cards.end(); it++) { print_card(*it); }
+	for (auto it = this->players[index]->red_cards.begin(); it != this->players[index]->red_cards.end(); it++) 
+		print_card(*it);
 	cout << endl;
-	for (auto it = this->players[index]->purple_cards.begin(); it != this->players[index]->purple_cards.end(); it++) { print_card(*it); }
+	for (auto it = this->players[index]->purple_cards.begin(); it != this->players[index]->purple_cards.end(); it++)  
+		print_card(*it); 
 	cout << endl;
-	for (auto it = this->players[index]->yellow_cards.begin(); it != this->players[index]->yellow_cards.end(); it++) { print_card(*it); }
+	for (auto it = this->players[index]->yellow_cards.begin(); it != this->players[index]->yellow_cards.end(); it++) 
+		print_card(*it);
 	cout << endl;
 }
 

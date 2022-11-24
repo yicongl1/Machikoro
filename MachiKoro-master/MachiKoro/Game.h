@@ -41,10 +41,31 @@ public:
 	void end_of_turn();
 	void view_slot_cards(bool cls);
 	void view_player_cards(int index, bool cls);
+	class iterator :public vector<vector<Card*>>::iterator{
+	public:
+		iterator(vector<vector<Card*>>::iterator it = vector<vector<Card*>>::iterator()) : vector<vector<Card*>>::iterator(it) {};
+	};
+	iterator begin()
+	{
+		return iterator(slot.begin());
+	}
+	iterator end()
+	{
+		return iterator(slot.end());
+	}
+	static Game* getInstance()
+	{
+		if (instance == NULL) {
+			instance = new Game();
+		}
+
+		return instance;
+	}
 private:
 	int dice;
 	int dice1;
 	int dice2;
+	static Game* instance;
 	void rolling_dice(int dice_count);
 	int player_input(string message);
 	vector<vector<Card *>> slot;

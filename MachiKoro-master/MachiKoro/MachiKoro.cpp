@@ -17,9 +17,10 @@ void view_slots(Game *g)
 	}
 }
 
+
 int main()
 {
-	Game *g = new Game();
+	Game *g = Game::getInstance();
 	g->version_old = g->choose_game();
 	while (!g->is_game_over)
 	{
