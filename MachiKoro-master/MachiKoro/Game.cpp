@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include <iomanip>
 #include <string>
 #include <sstream>
@@ -23,7 +23,7 @@ Game::Game()
 	this->create_player("Jim");
 }
 
-vector<string> split(string str)//Í¨¹ı¿Õ¸ñ¼ü·Ö¿ª×Ö·û´®
+vector<string> split(string str)//é€šè¿‡ç©ºæ ¼é”®åˆ†å¼€å­—ç¬¦ä¸²
 {
 	stringstream ss(str);
 	string item;
@@ -36,35 +36,35 @@ vector<string> split(string str)//Í¨¹ı¿Õ¸ñ¼ü·Ö¿ª×Ö·û´®
 
 bool Game::choose_game()
 {
-	cout << "Welcome to MachiKoro"<<endl<<endl;
-	cout << "Here are two version of this game." << endl<<endl;
-	cout << "One is ORIGIN version , the other is DLC version" << endl<<endl;
-	cout << "Which one do you want to play?(origin/dlc)" << endl;
+	cout << "Bienvenue Ã  MachiKoro"<<endl<<endl;
+	cout << "Voici deux versions de ce jeu" << endl<<endl;
+	cout << "L'une est la version ORIGINE, l'autre la version DLC" << endl<<endl;
+	cout << "Lequel voulez-vous jouer ? (origin/dlc)" << endl;
 	string cmds = "(origin)"
 		"|(dlc)";
-	regex view(cmds);//ÕıÔò
+	regex view(cmds);//æ­£åˆ™
 	while (true)
 	{
 		string str;
 		getline(cin, str);
-		vector<string> input = split(str);//Í¨¹ı¿Õ¸ñ·Ö¿ª×Ö·û´®£¬µÃµ½input[0]£¬input[1]
+		vector<string> input = split(str);//é€šè¿‡ç©ºæ ¼åˆ†å¼€å­—ç¬¦ä¸²ï¼Œå¾—åˆ°input[0]ï¼Œinput[1]
 		if (!regex_match(str, view))
 		{
-			cout << "Unknown Command" << endl;
+			cout << "Commande inconnue" << endl;
 		}
 		else if (input[0] == "origin") return true;
 		else if (input[0] == "dlc") return false;
 	}
 }
 
-void Game::create_player(string name, bool bot)//´´ÔìÈËÎï£¬²¢³õÊ¼»¯·¢ËÍ¿¨Æ¬£¨Ò»¸öWheatField£¬Ò»¸öBakery£©
+void Game::create_player(string name, bool bot)//åˆ›é€ äººç‰©ï¼Œå¹¶åˆå§‹åŒ–å‘é€å¡ç‰‡ï¼ˆä¸€ä¸ªWheatFieldï¼Œä¸€ä¸ªBakeryï¼‰
 {
 	player* p = new player();
 	p->bank = new Bank();
 	p->name = name;
 	p->isBot = bot;
 
-	YellowCard* c;//»ÆÉ«¿¨ÒÑ¾­¼ÓÈëµ½ÈËÎï¿¨°üÀïÃæ£¬µ«¼¤»î×´Ì¬Ä¬ÈÏÎªfalse
+	YellowCard* c;//é»„è‰²å¡å·²ç»åŠ å…¥åˆ°äººç‰©å¡åŒ…é‡Œé¢ï¼Œä½†æ¿€æ´»çŠ¶æ€é»˜è®¤ä¸ºfalse
 	c = new TrainStation(); p->yellow_cards.push_back(c);
 	c = new ShoppingMall(); p->yellow_cards.push_back(c);
 	c = new AmusementPark(); p->yellow_cards.push_back(c);
@@ -79,19 +79,19 @@ void Game::create_player(string name, bool bot)//´´ÔìÈËÎï£¬²¢³õÊ¼»¯·¢ËÍ¿¨Æ¬£¨Ò»¸
 	players.push_back(p);
 }
 
-void Game::deal()//´Ó×ÀÃæ·¢ÅÆµ½¿¨²Û£¬¿¨²ÛÖĞÓĞÊ®ÖÖ¿¨ÅÆ
+void Game::deal()//ä»æ¡Œé¢å‘ç‰Œåˆ°å¡æ§½ï¼Œå¡æ§½ä¸­æœ‰åç§å¡ç‰Œ
 {
 	Card* c;
 	bool exists;
 	int slotnum = 10;
 	if (this->version_old) slotnum = 16;
-	while (this->d->deck.size() > 0 && this->slot.size() < slotnum)//×ÀÃæÉÏÓĞÅÆ£¬²¢ÇÒ×ÔÉí¿¨²Û»¹ÓĞÊ£Óà¿Õ¼ä£¨Ğ¡ÓÚÊ®ÖÖ£©
+	while (this->d->deck.size() > 0 && this->slot.size() < slotnum)//æ¡Œé¢ä¸Šæœ‰ç‰Œï¼Œå¹¶ä¸”è‡ªèº«å¡æ§½è¿˜æœ‰å‰©ä½™ç©ºé—´ï¼ˆå°äºåç§ï¼‰
 	{
 		exists = false;
 		c = this->d->deck.back();
 		for (auto it = this->slot.begin(); it != this->slot.end(); it++)
 		{
-			if (c->get_name().compare((*it)[0]->get_name()) == 0)//ÅĞ¶Ï³é¿¨ÊÇ·ñ³öÏÖÖØ¸´ÖÖÀà£¬ÈôÖØ¸´Ìí¼Ó½øslot[i]
+			if (c->get_name().compare((*it)[0]->get_name()) == 0)//åˆ¤æ–­æŠ½å¡æ˜¯å¦å‡ºç°é‡å¤ç§ç±»ï¼Œè‹¥é‡å¤æ·»åŠ è¿›slot[i]
 			{
 				it->push_back(c);
 				exists = true;
@@ -99,7 +99,7 @@ void Game::deal()//´Ó×ÀÃæ·¢ÅÆµ½¿¨²Û£¬¿¨²ÛÖĞÓĞÊ®ÖÖ¿¨ÅÆ
 			}
 		}
 
-		if (!exists)//Èô²»ÖØ¸´Ìí¼Ó½øslot
+		if (!exists)//è‹¥ä¸é‡å¤æ·»åŠ è¿›slot
 		{
 			vector<Card*> v;
 			v.push_back(c);
@@ -110,17 +110,17 @@ void Game::deal()//´Ó×ÀÃæ·¢ÅÆµ½¿¨²Û£¬¿¨²ÛÖĞÓĞÊ®ÖÖ¿¨ÅÆ
 	}
 }
 
-Deck* Game::get_deck()//»ñµÃ×ÀÃæ
+Deck* Game::get_deck()//è·å¾—æ¡Œé¢
 {
 	return this->d;
 }
 
-vector<vector<Card*>> Game::get_slot()//»ñµÃ¿¨²Û
+vector<vector<Card*>> Game::get_slot()//è·å¾—å¡æ§½
 {
 	return this->slot;
 }
 
-void Game::rolling_dice(int dice_count)//÷»×ÓÖÃÊı£¬Ò»¸ö»òÕßÁ½¸ö
+void Game::rolling_dice(int dice_count)//éª°å­ç½®æ•°ï¼Œä¸€ä¸ªæˆ–è€…ä¸¤ä¸ª
 {
 	this->dice1 = rand() % 6 + 1;
 	this->dice2 = 0;
@@ -133,16 +133,16 @@ void Game::rolling_dice(int dice_count)//÷»×ÓÖÃÊı£¬Ò»¸ö»òÕßÁ½¸ö
 
 }
 
-void print_card(Card* c)//´òÓ¡¿¨Æ¬£¬setwÏŞ¶¨¸ñÊ½
+void print_card(Card* c)//æ‰“å°å¡ç‰‡ï¼Œsetwé™å®šæ ¼å¼
 {
 
-	if (c->get_string_color() == "yellow")//µ¥¶ÀÉèÖÃ»Æ¿¨µÄ´òÓ¡
+	if (c->get_string_color() == "jaune")//å•ç‹¬è®¾ç½®é»„å¡çš„æ‰“å°
 	{
 		YellowCard* yc = dynamic_cast<YellowCard*>(c);
 		string ifactive;
 		if (yc->active == true)
 		{
-			ifactive = "owned";
+			ifactive = "possÃ©dÃ©";
 		}
 		else
 		{
@@ -171,17 +171,17 @@ void print_card(Card* c)//´òÓ¡¿¨Æ¬£¬setwÏŞ¶¨¸ñÊ½
 void print_card_heading()
 {
 	cout << left <<
-		setw(10) << "color" <<
-		setw(25) << "name" <<
+		setw(10) << "couleur" <<
+		setw(25) << "nom" <<
 		setw(5) << "cost" <<
 		setw(5) << "val" <<
-		setw(5) << "low" <<
-		setw(5) << "high" << endl;
+		setw(5) << "bas" <<
+		setw(5) << "haut" << endl;
 }
 
-void Game::view_slot_cards(bool cls)//´òÓ¡¿¨²Û¿¨Æ¬
+void Game::view_slot_cards(bool cls)//æ‰“å°å¡æ§½å¡ç‰‡
 {
-	if (cls) system("cls");//ÇåÆÁ
+	if (cls) system("cls");//æ¸…å±
 	for (int i = 0; i < 25; i++)cout << "-";
 	cout << "CARTES SUR TABLE";
 	for (int i = 0; i < 25; i++)cout << "-";
@@ -200,7 +200,7 @@ void Game::view_slot_cards(bool cls)//´òÓ¡¿¨²Û¿¨Æ¬
 	cout << endl;
 }
 
-void Game::view_player_cards(int index, bool cls)//´òÓ¡Íæ¼Ò¿¨Æ¬
+void Game::view_player_cards(int index, bool cls)//æ‰“å°ç©å®¶å¡ç‰‡
 {
 	if (cls) system("cls");
 	for (int i = 0; i < 25; i++)cout << "-";
@@ -225,20 +225,20 @@ void Game::view_player_cards(int index, bool cls)//´òÓ¡Íæ¼Ò¿¨Æ¬
 	cout << endl;
 }
 
-int Game::player_input(string message)//Íæ¼ÒÊäÈëÏëÒªµÄ²Ù×÷
+int Game::player_input(string message)//ç©å®¶è¾“å…¥æƒ³è¦çš„æ“ä½œ
 {
 	string cmds = "(no)"
-		"|(view [0-9]+)"
-		"|(view table)"
+		"|(voir [0-9]+)"
+		"|(voir table)"
 		"|(acheter [0-9]*)"
 		"|(acheter TrainStation)"
 		"|(acheter ShoppingMall)"
 		"|(acheter AmusementPark)"
 		"|(acheter RadioTower)";
-	bool isRound1 = true;//ÓÃÓÚ¼ÆËãAI¹ºÂò´ÎÊı
+	bool isRound1 = true;//ç”¨äºè®¡ç®—AIè´­ä¹°æ¬¡æ•°
 	int slotnum = 9;
 	if (this->version_old)	slotnum = 14;
-	regex view(cmds);//ÕıÔò
+	regex view(cmds);//æ­£åˆ™
 	bool complete = false;
 	while (true)
 	{
@@ -256,19 +256,19 @@ int Game::player_input(string message)//Íæ¼ÒÊäÈëÏëÒªµÄ²Ù×÷
 		}
 		else getline(cin, str);
 		isRound1 = false;
-		vector<string> input = split(str);//Í¨¹ı¿Õ¸ñ·Ö¿ª×Ö·û´®£¬µÃµ½input[0]£¬input[1]
+		vector<string> input = split(str);//é€šè¿‡ç©ºæ ¼åˆ†å¼€å­—ç¬¦ä¸²ï¼Œå¾—åˆ°input[0]ï¼Œinput[1]
 		if (!regex_match(str, view))
 		{
-			cout << "Commande non valide" << endl;
+			cout << "Commande inconnue" << endl;
 		}
 		else if (input[0] == "no") return -1;
-		else if (input[0] == "view")
+		else if (input[0] == "voir")
 		{
-			if (input[1] == "table") view_slot_cards(true);
+			if (input[1] == "tableau") view_slot_cards(true);
 
-			else if (stoi(input[1]) > this->players.size() - 1)//stoi½«string×ªÎªint
+			else if (stoi(input[1]) > this->players.size() - 1)//stoiå°†stringè½¬ä¸ºint
 			{
-				cout << "There is no player " << stoi(input[1]) << endl;
+				cout << "Il n'y a pas de joueur" << stoi(input[1]) << endl;
 				continue;
 			}
 			else view_player_cards(stoi(input[1]), true);
@@ -289,7 +289,7 @@ int Game::player_input(string message)//Íæ¼ÒÊäÈëÏëÒªµÄ²Ù×÷
 			}
 			else
 			{
-				cout << "You can't afford that" << endl;
+				cout << "Vous ne pouvez pas vous le permettre" << endl;
 				continue;
 			}
 		}
@@ -309,7 +309,7 @@ int Game::player_input(string message)//Íæ¼ÒÊäÈëÏëÒªµÄ²Ù×÷
 			}
 			else
 			{
-				cout << "You cant afford that" << endl;
+				cout << "Vous ne pouvez pas vous le permettre" << endl;
 				continue;
 			}
 		}
@@ -330,7 +330,7 @@ int Game::player_input(string message)//Íæ¼ÒÊäÈëÏëÒªµÄ²Ù×÷
 			}
 			else
 			{
-				cout << "You can't afford that" << endl;
+				cout << "Vous ne pouvez pas vous le permettre" << endl;
 				continue;
 			}
 		}
@@ -350,7 +350,7 @@ int Game::player_input(string message)//Íæ¼ÒÊäÈëÏëÒªµÄ²Ù×÷
 			}
 			else
 			{
-				cout << "You can't afford that" << endl;
+				cout << "Vous ne pouvez pas vous le permettre" << endl;
 				continue;
 			}
 		}
@@ -358,12 +358,12 @@ int Game::player_input(string message)//Íæ¼ÒÊäÈëÏëÒªµÄ²Ù×÷
 		{
 			if (stoi(input[1]) > this->slot.size())
 			{
-				cout << "No card at number: " << stoi(input[1]) << endl;
+				cout << "Pas de carte au numÃ©ro : " << stoi(input[1]) << endl;
 				continue;
 			}
 			if (this->players[this->turn]->bank->get_coins() < this->slot[stoi(input[1])][0]->get_cost())
 			{
-				cout << "You can't afford that" << endl;
+				cout << "Vous ne pouvez pas vous le permettre" << endl;
 				continue;
 			}
 			if (stoi(input[1]) < this->slot.size() && this->players[this->turn]->bank->get_coins() >= this->slot[stoi(input[1])][0]->get_cost())
@@ -376,32 +376,32 @@ int Game::player_input(string message)//Íæ¼ÒÊäÈëÏëÒªµÄ²Ù×÷
 	return 'a';
 }
 
-void Game::roll_dice()//ÖÀ÷»×ÓÖ÷³ÌĞò
+void Game::roll_dice()//æ·éª°å­ä¸»ç¨‹åº
 {
-	system("cls");//ÇåÆÁ
-	this->deal();//ÅĞ¶Ï¿¨²ÛÊÇ·ñĞèÒª¼ÓÅÆ£¨²¢¼ÓÅÆ£©
-	this->view_slot_cards(true);//´òÓ¡¿¨²Û¿¨Æ¬
-	this->view_player_cards(this->turn, false);//´òÓ¡µ±Ç°Íæ¼Ò¿¨Æ¬
+	system("cls");//æ¸…å±
+	this->deal();//åˆ¤æ–­å¡æ§½æ˜¯å¦éœ€è¦åŠ ç‰Œï¼ˆå¹¶åŠ ç‰Œï¼‰
+	this->view_slot_cards(true);//æ‰“å°å¡æ§½å¡ç‰‡
+	this->view_player_cards(this->turn, false);//æ‰“å°å½“å‰ç©å®¶å¡ç‰‡
 
-	int dice_count = 1;//Ä¬ÈÏ÷»×ÓÎª1¸ö
+	int dice_count = 1;//é»˜è®¤éª°å­ä¸º1ä¸ª
 
 	// Should be Train Station Card
 	if (this->players[this->turn]->yellow_cards[0]->active)
 	{
 		string d;
 		bool s=true;
-		cout << "1 or 2 dice: ";
+		cout << "1 ou 2 dÃ©s : ";
 		string cmds = "(1)"
 			"|(2)";
-		regex view(cmds);//ÕıÔò
+		regex view(cmds);//æ­£åˆ™
 		while (s)
 		{
 			string str;
 			getline(cin, str);
-			vector<string> input = split(str);//Í¨¹ı¿Õ¸ñ·Ö¿ª×Ö·û´®£¬µÃµ½input[0]£¬input[1]
+			vector<string> input = split(str);//é€šè¿‡ç©ºæ ¼åˆ†å¼€å­—ç¬¦ä¸²ï¼Œå¾—åˆ°input[0]ï¼Œinput[1]
 			if (!regex_match(str, view))
 			{
-				cout << "Unknown Command" << endl;
+				cout << "Commande inconnue" << endl;
 			}
 			else if (input[0] == "1") { dice_count = atoi(str.c_str()); s= false; }
 			else if (input[0] == "2") { dice_count = atoi(str.c_str()); s = false; }
@@ -411,10 +411,10 @@ void Game::roll_dice()//ÖÀ÷»×ÓÖ÷³ÌĞò
 	}
 	this->rolling_dice(dice_count);
 
-	// Should be Radio Tower£¨Èç¹ûÓĞRadio Tower£¬¿ÉÒÔÖØĞÂÖÀ÷»×Ó£©
+	// Should be Radio Towerï¼ˆå¦‚æœæœ‰Radio Towerï¼Œå¯ä»¥é‡æ–°æ·éª°å­ï¼‰
 	if (this->players[this->turn]->yellow_cards[3]->active)
 	{
-		cout << "Rolled a " << this->dice << ". Reroll(y/n): ";
+		cout << "RoulÃ© un " << this->dice << ". Relancer (y/n) : ";
 		char response;
 		cin >> response;
 		if (response == 'y') this->rolling_dice(dice_count);
@@ -426,17 +426,17 @@ void Game::roll_dice()//ÖÀ÷»×ÓÖ÷³ÌĞò
 	for (int i = 0; i < 25; i++)cout << "-";
 	cout << "\n\n";
 	cout << "Joueur: " << this->turn << endl <<
-		"Roul¨¦ un: " << this->dice << endl << 
-		"Pi¨¨ces de pr¨¦-r¨¨glement: " << this->players[this->turn]->bank->get_coins() << endl;
-	this->red_card_check();//ÏÈ½øĞĞºì¿¨µÄÅĞ¶¨
+		"RoulÃ© un: " << this->dice << endl << 
+		"PiÃ¨ces de prÃ©-rÃ¨glement: " << this->players[this->turn]->bank->get_coins() << endl;
+	this->red_card_check();//å…ˆè¿›è¡Œçº¢å¡çš„åˆ¤å®š
 }
 
-void Game::red_card_check()//ÅĞ¶ÏÊÇ·ñ´æÔÚºìÉ«¿¨Æ¬£¬
+void Game::red_card_check()//åˆ¤æ–­æ˜¯å¦å­˜åœ¨çº¢è‰²å¡ç‰‡ï¼Œ
 {
 	int tracker = this->turn - 1;
 	if (tracker < 0) tracker = this->players.size() - 1;
 
-	while (tracker != this->turn)//¶Ô³ı×ÔÉíÖ®ÍâÆäËûÍæ¼ÒÊ¹ÓÃ
+	while (tracker != this->turn)//å¯¹é™¤è‡ªèº«ä¹‹å¤–å…¶ä»–ç©å®¶ä½¿ç”¨
 	{
 		for (int i = 0; i < this->players[tracker]->red_cards.size(); i++)
 		{
@@ -446,7 +446,7 @@ void Game::red_card_check()//ÅĞ¶ÏÊÇ·ñ´æÔÚºìÉ«¿¨Æ¬£¬
 				Card* c = NULL;
 				// Should be Shopping Mall
 				if (this->players[tracker]->yellow_cards[2]->active) c = this->players[tracker]->red_cards[i];
-				this->players[tracker]->red_cards[i]->action(//actionÔÚ¼Ì³ĞÀàÖĞÖØĞÂ¶¨Òå£¬Ö´ĞĞºì¿¨¿ÛÇ®²Ù×÷
+				this->players[tracker]->red_cards[i]->action(//actionåœ¨ç»§æ‰¿ç±»ä¸­é‡æ–°å®šä¹‰ï¼Œæ‰§è¡Œçº¢å¡æ‰£é’±æ“ä½œ
 					this->players[tracker]->bank,
 					this->players[this->turn]->bank,
 					c,
@@ -460,9 +460,9 @@ void Game::red_card_check()//ÅĞ¶ÏÊÇ·ñ´æÔÚºìÉ«¿¨Æ¬£¬
 		if (tracker < 0) tracker = this->players.size() - 1;
 
 	}
-	this->blue_card_check();//½øĞĞÀ¶¿¨µÄÅĞ¶¨
+	this->blue_card_check();//è¿›è¡Œè“å¡çš„åˆ¤å®š
 }
-void Game::blue_card_check()//¶ÔËùÓĞÓĞ´ËÀ¶¿¨Íæ¼ÒÓĞĞ§
+void Game::blue_card_check()//å¯¹æ‰€æœ‰æœ‰æ­¤è“å¡ç©å®¶æœ‰æ•ˆ
 {
 	for (int i = 0; i < this->players.size(); i++)
 	{
@@ -471,7 +471,7 @@ void Game::blue_card_check()//¶ÔËùÓĞÓĞ´ËÀ¶¿¨Íæ¼ÒÓĞĞ§
 			if (this->dice <= this->players[i]->blue_cards[j]->get_high_roll() &&
 				this->dice >= this->players[i]->blue_cards[j]->get_low_roll())
 			{
-				this->players[i]->blue_cards[j]->action(//actionÔÚ¼Ì³ĞÀàÖĞÖØĞÂ¶¨Òå
+				this->players[i]->blue_cards[j]->action(//actionåœ¨ç»§æ‰¿ç±»ä¸­é‡æ–°å®šä¹‰
 					this->players[i]->bank,
 					NULL,
 					NULL,
@@ -481,9 +481,9 @@ void Game::blue_card_check()//¶ÔËùÓĞÓĞ´ËÀ¶¿¨Íæ¼ÒÓĞĞ§
 			}
 		}
 	}
-	this->green_card_check();//½øĞĞÂÌ¿¨µÄÅĞ¶¨
+	this->green_card_check();//è¿›è¡Œç»¿å¡çš„åˆ¤å®š
 }
-void Game::green_card_check()//¶Ô×ÔÉíÓĞĞ§
+void Game::green_card_check()//å¯¹è‡ªèº«æœ‰æ•ˆ
 {
 	for (int i = 0; i < this->players[this->turn]->green_cards.size(); i++)
 	{
@@ -502,7 +502,7 @@ void Game::green_card_check()//¶Ô×ÔÉíÓĞĞ§
 					if (icon == this->players[this->turn]->blue_cards[j]->get_icon()) val++;
 				}
 			}
-			this->players[this->turn]->green_cards[i]->action(//actionÔÚ¼Ì³ĞÀàÖĞÖØĞÂ¶¨Òå
+			this->players[this->turn]->green_cards[i]->action(//actionåœ¨ç»§æ‰¿ç±»ä¸­é‡æ–°å®šä¹‰
 				this->players[this->turn]->bank,
 				NULL,
 				c,
@@ -511,7 +511,7 @@ void Game::green_card_check()//¶Ô×ÔÉíÓĞĞ§
 			);
 		}
 	}
-	this->purple_card_check();//½øĞĞ×Ï¿¨µÄÅĞ¶¨
+	this->purple_card_check();//è¿›è¡Œç´«å¡çš„åˆ¤å®š
 }
 
 // TODO: Refactor this. Especially the card swapping. It u-g-l-y
@@ -528,7 +528,7 @@ void Game::purple_card_check()
 		}
 		if (this->players[this->turn]->purple_cards[i]->get_name().compare("TV Station") == 0)
 		{
-			cout << "Take up to 5 coins from: ";
+			cout << "Prenez jusqu'Ã  5 piÃ¨ces de : ";
 			for (int j = 0; j < this->players.size(); j++)
 			{
 				cout << j << ": " << this->players[j]->bank->get_coins() << " ";
@@ -539,23 +539,23 @@ void Game::purple_card_check()
 		}
 		if (this->players[this->turn]->purple_cards[i]->get_name().compare("Business Center") == 0)
 		{
-			cout << "Trade Cards with a player:" << endl;
+			cout << "Ã‰changez des cartes avec un joueur : " << endl;
 			for (int j = 0; j < this->players.size(); j++)
 			{
-				cout << "Player: " << j << endl;
-				cout << "Blue(1): ";
+				cout << "Joueur  : " << j << endl;
+				cout << "blue(1) : ";
 				for (int k = 0; i < this->players[j]->blue_cards.size(); k++)
 				{
 					cout << " |" << k << ": " << this->players[j]->blue_cards[k]->get_name();
 				}
 				cout << endl;
-				cout << "Green(2): ";
+				cout << "Vert(2) : ";
 				for (int k = 0; i < this->players[j]->green_cards.size(); k++)
 				{
 					cout << " |" << k << ": " << this->players[j]->green_cards[k]->get_name();
 				}
 				cout << endl;
-				cout << "Red(3): ";
+				cout << "Rouge(3) : ";
 				for (int k = 0; i < this->players[j]->red_cards.size(); k++)
 				{
 					cout << " |" << k << ": " << this->players[j]->red_cards[k]->get_name();
@@ -565,15 +565,15 @@ void Game::purple_card_check()
 			int player_num;
 			int color_num;
 			int card_num;
-			cout << "Select Player to take: ";
+			cout << "SÃ©lectionnez le joueur Ã  prendre : ";
 			cin >> player_num;
 			cout << endl;
 
-			cout << "Select Color to take: ";
+			cout << "SÃ©lectionnez la couleur Ã  prendre : ";
 			cin >> color_num;
 			cout << endl;
 
-			cout << "Select Card to take: ";
+			cout << "SÃ©lectionnez la carte Ã  prendre : ";
 			cin >> card_num;
 			cout << endl;
 
@@ -593,11 +593,11 @@ void Game::purple_card_check()
 				this->players[player_num]->red_cards.erase(this->players[player_num]->red_cards.begin() + card_num);
 			}
 
-			cout << "Select Color to give: ";
+			cout << "SÃ©lectionnez la couleur Ã  donner : ";
 			cin >> color_num;
 			cout << endl;
 
-			cout << "Select Card to give: ";
+			cout << "SÃ©lectionnez la carte Ã  donner : ";
 			cin >> card_num;
 			cout << endl;
 
@@ -618,13 +618,13 @@ void Game::purple_card_check()
 			}
 		}
 	}
-	this->buy_propery();//½øÈëÂò¿¨²Ù×÷
+	this->buy_propery();//è¿›å…¥ä¹°å¡æ“ä½œ
 }
 
 // TODO: Allow buying of property
 void Game::buy_propery()
 {
-	cout << "Pi¨¨ces apr¨¨s r¨¨glement: " << this->players[this->turn]->bank->get_coins() << endl;
+	cout << "PiÃ¨ces aprÃ¨s rÃ¨glement: " << this->players[this->turn]->bank->get_coins() << endl;
 	for (int i = 0; i < 70; i++)cout << "-";
 	cout << "\n\n";
 	cout << "Lequel voulez-vous acheter (no or 0-9 or TrainStation/ShoppingMall/AmusementPark/RadioTower)?" << endl;
@@ -632,15 +632,15 @@ void Game::buy_propery()
 	bool complete = false;
 	while (!complete)
 	{
-		selection = this->player_input("Lequel voulez-vous acheter (no or 0-9 or TrainStation/ShoppingMall/AmusementPark/RadioTower)?");//Ñ¡ÔñÒªÂòµÄ¿¨ºÅ
+		selection = this->player_input("Lequel voulez-vous acheter (no or 0-9 or TrainStation/ShoppingMall/AmusementPark/RadioTower)?");//é€‰æ‹©è¦ä¹°çš„å¡å·
 		cout << endl;
 		if (selection > 0)
 		{
 			int select = selection;
-			if (Color::blue == this->slot[select][0]->get_color())//¸ù¾İÑÕÉ«¶Ô¿¨Æ¬½øĞĞ·ÖÀà¼ÓÈëÍæ¼ÒÊÖÖĞ
+			if (Color::blue == this->slot[select][0]->get_color())//æ ¹æ®é¢œè‰²å¯¹å¡ç‰‡è¿›è¡Œåˆ†ç±»åŠ å…¥ç©å®¶æ‰‹ä¸­
 			{
-				this->players[this->turn]->blue_cards.push_back((BlueCard*)this->slot[select].back());//½«¿¨²ÛÖĞ¶ÔÓ¦¿¨Æ¬¼ÓÈëµ½Íæ¼ÒÊÖÖĞ
-				this->slot[select].pop_back();//¶ª³ö¿¨²ÛÖĞµÄ¿¨
+				this->players[this->turn]->blue_cards.push_back((BlueCard*)this->slot[select].back());//å°†å¡æ§½ä¸­å¯¹åº”å¡ç‰‡åŠ å…¥åˆ°ç©å®¶æ‰‹ä¸­
+				this->slot[select].pop_back();//ä¸¢å‡ºå¡æ§½ä¸­çš„å¡
 				complete = true;
 			}
 			else if (Color::green == this->slot[select][0]->get_color())
@@ -662,7 +662,7 @@ void Game::buy_propery()
 				{
 					if (this->slot[select].back()->get_name().compare(this->players[this->turn]->purple_cards[i]->get_name()) == 0)
 					{
-						cout << "You already have this establishment" << endl;
+						cout << "Vous avez dÃ©jÃ  cet Ã©tablissement" << endl;
 						purp = false;
 					}
 				}
@@ -673,9 +673,9 @@ void Game::buy_propery()
 					complete = true;
 				}
 			}
-			else if (Color::yellow == this->slot[select][0]->get_color())//»ÆÉ«¿¨Æ¬µÄ¹ºÂò»¹Ã»ÓĞĞ´£¬ÒòÎª»ÆÉ«¿¨Æ¬²»ÊÇ´Ó¿¨²ÛÖĞ³éÈ¡£¬´ó¼Ò¿ª¾Ö¶¼ÓĞ»Æ¿¨£¬µ«ÊÇ×´Ì¬²»ÊÇactive
+			else if (Color::yellow == this->slot[select][0]->get_color())//é»„è‰²å¡ç‰‡çš„è´­ä¹°è¿˜æ²¡æœ‰å†™ï¼Œå› ä¸ºé»„è‰²å¡ç‰‡ä¸æ˜¯ä»å¡æ§½ä¸­æŠ½å–ï¼Œå¤§å®¶å¼€å±€éƒ½æœ‰é»„å¡ï¼Œä½†æ˜¯çŠ¶æ€ä¸æ˜¯active
 			{
-				//TODO: Implement buying mello yello(ÒòÎª»Æ¿¨ÒÑ¾­ÔÚÍæ¼ÒÊÖÉÏ£¬ËùÒÔÕâ¿é²»ÓÃ×ö£©
+				//TODO: Implement buying mello yello(å› ä¸ºé»„å¡å·²ç»åœ¨ç©å®¶æ‰‹ä¸Šï¼Œæ‰€ä»¥è¿™å—ä¸ç”¨åšï¼‰
 			}
 			if (this->slot[select].size() == 0)
 			{
@@ -690,7 +690,7 @@ void Game::buy_propery()
 	this->end_of_turn();
 }
 
-void Game::end_of_turn()//¶ÔÊÇ·ñ½áÊø½øĞĞÅĞ¶¨£¬²¢ÇÒ½øÈëÏÂÒ»Íæ¼Ò»ØºÏ
+void Game::end_of_turn()//å¯¹æ˜¯å¦ç»“æŸè¿›è¡Œåˆ¤å®šï¼Œå¹¶ä¸”è¿›å…¥ä¸‹ä¸€ç©å®¶å›åˆ
 {
 	this->is_game_over = true;
 	for (int i = 0; i < this->players[turn]->yellow_cards.size(); i++)
@@ -705,8 +705,8 @@ void Game::end_of_turn()//¶ÔÊÇ·ñ½áÊø½øĞĞÅĞ¶¨£¬²¢ÇÒ½øÈëÏÂÒ»Íæ¼Ò»ØºÏ
 	cout << "REGLEMENT ROND";
 	for (int i = 0; i < 25; i++)cout << "-";
 	cout << "\n\n";
-	if (this->is_game_over) { cout << this->turn << " wins" << endl; return; }//ÅĞ¶ÏÊÇ·ñ»ñÊ¤
-	cout << "Fin du tour de " << this->turn << endl<< "Pi¨¨ces apr¨¨s l¡¯achat: " << this->players[turn]->bank->get_coins();//´òÓ¡±¾ÂÖÍæ¼ÒËùÊ£Ó²±Ò
+	if (this->is_game_over) { cout << this->turn << " wins" << endl; return; }//åˆ¤æ–­æ˜¯å¦è·èƒœ
+	cout << "Fin du tour de " << this->turn << endl<< "PiÃ¨ces aprÃ¨s lâ€™achat: " << this->players[turn]->bank->get_coins();//æ‰“å°æœ¬è½®ç©å®¶æ‰€å‰©ç¡¬å¸
 	this->turn++;
 
 	// Should be Amusement Park card
@@ -715,6 +715,6 @@ void Game::end_of_turn()//¶ÔÊÇ·ñ½áÊø½øĞĞÅĞ¶¨£¬²¢ÇÒ½øÈëÏÂÒ»Íæ¼Ò»ØºÏ
 		turn--;
 	}
 	if (this->turn == players.size()) this->turn = 0;
-	cout << endl << "Tour de "<<this->turn << " apr¨¨s" << endl;//´òÓ¡ÏÂÂÖÍæ¼Ò
+	cout << endl << "Tour de "<<this->turn << " aprÃ¨s" << endl;//æ‰“å°ä¸‹è½®ç©å®¶
 	return;
 }

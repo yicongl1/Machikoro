@@ -87,12 +87,12 @@ string Card::get_string_color()
 	case Color::blue:
 		return "blue";
 	case Color::green:
-		return "green";
+		return "vert";
 	case Color::red:
-		return "red";
+		return "rouge";
 	case Color::purple:
-		return "purple";
+		return "pourpre";
 	case Color::yellow:
-		return "yellow";
+		return "jaune";
 	}
 }

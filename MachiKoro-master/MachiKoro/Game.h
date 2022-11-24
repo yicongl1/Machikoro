@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-
 #include "Card.h"
 #include "Bank.h"
 #include "Deck.h"
