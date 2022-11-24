@@ -20,11 +20,10 @@ void view_slots(Game *g)
 
 int main()
 {
-	Game *g = Game::getInstance();
-	g->version_old = g->choose_game();
-	while (!g->is_game_over)
+	Game::getInstance()->version_old = Game::getInstance()->choose_game();
+	while (!Game::getInstance()->is_game_over)
 	{
-		g->roll_dice();
+		Game::getInstance()->roll_dice();
 		system("pause");
 	}
 
