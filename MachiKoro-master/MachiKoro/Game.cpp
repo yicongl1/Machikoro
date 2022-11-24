@@ -89,11 +89,11 @@ void Game::deal()//从桌面发牌到卡槽，卡槽中有十种卡牌
 	{
 		exists = false;
 		c = this->d->deck.back();
-		for (int i = 0; i < this->slot.size(); i++)
+		for (auto it = this->slot.begin(); it != this->slot.end(); it++)
 		{
-			if (c->get_name().compare(this->slot[i][0]->get_name()) == 0)//判断抽卡是否出现重复种类，若重复添加进slot[i]
+			if (c->get_name().compare((*it)[0]->get_name()) == 0)//判断抽卡是否出现重复种类，若重复添加进slot[i]
 			{
-				slot[i].push_back(c);
+				it->push_back(c);
 				exists = true;
 				break;
 			}
