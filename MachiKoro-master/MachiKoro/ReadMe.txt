@@ -38,7 +38,3 @@ AppWizard uses "TODO:" comments to indicate parts of the source code you
 should add to or customize.
 
 /////////////////////////////////////////////////////////////////////////////
-
-test2022/10/21
-test2022/10/22 by cn
-test2022/11/1 by cn
