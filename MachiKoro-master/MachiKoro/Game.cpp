@@ -13,7 +13,7 @@ Game::Game()
 	this->d = new Deck();
 	this->slot_count = 0;
 	this->is_game_over = false;
-	this->version_old;
+	this->version_old=this->choose_game();
 	this->turn = 0;
 	this->deal();
 	this->num_ai_player();
@@ -31,6 +31,7 @@ vector<string> split(string str)//通过空格键分开字符串
 }
 void Game::num_ai_player()//创造人物，并初始化发送卡片（一个WheatField，一个Bakery）
 {
+	system("cls");//清屏
 	int num = 0;
 	int ai_num = 0;
 	cout << "the number of player:" << endl;
