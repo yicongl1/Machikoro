@@ -16,11 +16,7 @@ Game::Game()
 	this->version_old;
 	this->turn = 0;
 	this->deal();
-
-	this->create_player("Michael",true);
-	this->create_player("Dave");
-	this->create_player("Bob",true);
-	this->create_player("Jim");
+	this->num_ai_player();
 }
 
 vector<string> split(string str)//通过空格键分开字符串
@@ -33,12 +29,38 @@ vector<string> split(string str)//通过空格键分开字符串
 	}
 	return tokens;
 }
+void Game::num_ai_player()//创造人物，并初始化发送卡片（一个WheatField，一个Bakery）
+{
+	int num = 0;
+	int ai_num = 0;
+	cout << "the number of player:" << endl;
+	cin >> num;
+	if (num == 0)
+	{
+		cout << "invalid number,please rewrite" << endl;
+		cout << "the number of player:" << endl;
+		cin >> num;
+	}
+	cout << "the number of ai_player:" << endl;
+	cin >> ai_num;
+	for (int i = 1; i <= (num - ai_num); i++)
+	{
+		string name;
+		cout << "The " << i << " player's name is " << endl;
+		cin >> name;
+		create_player(name);
+	}
+	for (int ai = 1; ai <= ai_num; ai++)
+	{
+		create_player("ai", true);
+	}
+}
 
 bool Game::choose_game()
 {
-	cout << "Bienvenue à MachiKoro"<<endl<<endl;
-	cout << "Voici deux versions de ce jeu" << endl<<endl;
-	cout << "L'une est la version ORIGINE, l'autre la version DLC" << endl<<endl;
+	cout << "Bienvenue à MachiKoro" << endl << endl;
+	cout << "Voici deux versions de ce jeu" << endl << endl;
+	cout << "L'une est la version ORIGINE, l'autre la version DLC" << endl << endl;
 	cout << "Lequel voulez-vous jouer ? (origin/dlc)" << endl;
 	string cmds = "(origin)"
 		"|(dlc)";
@@ -208,19 +230,19 @@ void Game::view_player_cards(int index, bool cls)//打印玩家卡片
 	for (int i = 0; i < 25; i++)cout << "-";
 	cout << "\n\n";
 	print_card_heading();
-	for (auto it = this->players[index]->blue_cards.begin(); it != this->players[index]->blue_cards.end(); it++) 
+	for (auto it = this->players[index]->blue_cards.begin(); it != this->players[index]->blue_cards.end(); it++)
 		print_card(*it);
 	cout << endl;
-	for (auto it = this->players[index]->green_cards.begin(); it != this->players[index]->green_cards.end(); it++) 
-		print_card(*it); 
-	cout << endl;
-	for (auto it = this->players[index]->red_cards.begin(); it != this->players[index]->red_cards.end(); it++) 
+	for (auto it = this->players[index]->green_cards.begin(); it != this->players[index]->green_cards.end(); it++)
 		print_card(*it);
 	cout << endl;
-	for (auto it = this->players[index]->purple_cards.begin(); it != this->players[index]->purple_cards.end(); it++)  
-		print_card(*it); 
+	for (auto it = this->players[index]->red_cards.begin(); it != this->players[index]->red_cards.end(); it++)
+		print_card(*it);
 	cout << endl;
-	for (auto it = this->players[index]->yellow_cards.begin(); it != this->players[index]->yellow_cards.end(); it++) 
+	for (auto it = this->players[index]->purple_cards.begin(); it != this->players[index]->purple_cards.end(); it++)
+		print_card(*it);
+	cout << endl;
+	for (auto it = this->players[index]->yellow_cards.begin(); it != this->players[index]->yellow_cards.end(); it++)
 		print_card(*it);
 	cout << endl;
 }
@@ -250,7 +272,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 				str = "acheter ";
 				srand(time(0));
 				str += to_string(rand() % slotnum);
-				cout << str<<endl;
+				cout << str << endl;
 			}
 			else str = "no";
 		}
@@ -325,7 +347,7 @@ int Game::player_input(string message)//玩家输入想要的操作
 				this->players[this->turn]->yellow_cards[2]->active = true;//TODO:cost money(qyb)
 				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[2]->get_cost());
 
-				
+
 				return (this->players[this->turn]->bank->get_coins());
 			}
 			else
@@ -389,7 +411,7 @@ void Game::roll_dice()//掷骰子主程序
 	if (this->players[this->turn]->yellow_cards[0]->active)
 	{
 		string d;
-		bool s=true;
+		bool s = true;
 		cout << "1 ou 2 dés : ";
 		string cmds = "(1)"
 			"|(2)";
@@ -403,10 +425,10 @@ void Game::roll_dice()//掷骰子主程序
 			{
 				cout << "Commande inconnue" << endl;
 			}
-			else if (input[0] == "1") { dice_count = atoi(str.c_str()); s= false; }
+			else if (input[0] == "1") { dice_count = atoi(str.c_str()); s = false; }
 			else if (input[0] == "2") { dice_count = atoi(str.c_str()); s = false; }
 			else
-				s= true;
+				s = true;
 		}
 	}
 	this->rolling_dice(dice_count);
@@ -426,7 +448,7 @@ void Game::roll_dice()//掷骰子主程序
 	for (int i = 0; i < 25; i++)cout << "-";
 	cout << "\n\n";
 	cout << "Joueur: " << this->turn << endl <<
-		"Roulé un: " << this->dice << endl << 
+		"Roulé un: " << this->dice << endl <<
 		"Pièces de pré-règlement: " << this->players[this->turn]->bank->get_coins() << endl;
 	this->red_card_check();//先进行红卡的判定
 }
@@ -706,7 +728,7 @@ void Game::end_of_turn()//对是否结束进行判定，并且进入下一玩家
 	for (int i = 0; i < 25; i++)cout << "-";
 	cout << "\n\n";
 	if (this->is_game_over) { cout << this->turn << " wins" << endl; return; }//判断是否获胜
-	cout << "Fin du tour de " << this->turn << endl<< "Pièces après l’achat: " << this->players[turn]->bank->get_coins();//打印本轮玩家所剩硬币
+	cout << "Fin du tour de " << this->turn << endl << "Pièces après l’achat: " << this->players[turn]->bank->get_coins();//打印本轮玩家所剩硬币
 	this->turn++;
 
 	// Should be Amusement Park card
@@ -715,6 +737,6 @@ void Game::end_of_turn()//对是否结束进行判定，并且进入下一玩家
 		turn--;
 	}
 	if (this->turn == players.size()) this->turn = 0;
-	cout << endl << "Tour de "<<this->turn << " après" << endl;//打印下轮玩家
+	cout << endl << "Tour de " << this->turn << " après" << endl;//打印下轮玩家
 	return;
 }
