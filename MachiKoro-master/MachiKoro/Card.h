@@ -8,6 +8,7 @@ using namespace std;
 namespace machi {
 	class Card {
 	public:
+		virtual ~Card() = default;
 		virtual void action(Bank *p1, Bank *p2, Card *c1, Card *c2, int val) = 0;
 		void set_cost(int cost);
 		void set_value(int value);
@@ -17,7 +18,8 @@ namespace machi {
 		void set_low_roll(int low);
 		void set_high_roll(int high);
 		void set_icon(Icon icon);
-		void set_card(string name, int value, int cost, int low_roll, int high_roll, Icon icon, Color color);
+		// 参数顺序：名字、费用、收益、最低点数、最高点数、图标、颜色
+		void set_card(string name, int cost, int value, int low_roll, int high_roll, Icon icon, Color color);
 
 		int get_value();
 		int get_cost();
@@ -32,13 +34,13 @@ namespace machi {
 		string get_string_color();
 
 	private:
-		int low_roll;
-		int high_roll;
-		int cost;
-		int value;
-		Color color;
-		Icon icon;
-		bool renovation;
+		int low_roll = 0;
+		int high_roll = 0;
+		int cost = 0;
+		int value = 0;
+		Color color = Color::blue;
+		Icon icon = Icon::none;
+		bool renovation = false;
 		string name;
 
 	};

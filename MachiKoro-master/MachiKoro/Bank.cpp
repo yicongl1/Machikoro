@@ -18,11 +18,12 @@ void Bank::deposit(int val)
 
 int Bank::withdraw(int val)
 {
+	if (val <= 0) return 0;
 	if (val > this->coins)
 	{
 		int temp = this->coins;
 		this->coins = 0;
-		return this->coins;
+		return temp;
 	}
 	else
 	{

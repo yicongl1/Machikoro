@@ -20,6 +20,11 @@ void GreenCard::set_multiplier_icon(Icon icon)
 	this->multiplier = icon;
 }
 
+Icon GreenCard::get_multiplier_icon()
+{
+	return this->multiplier;
+}
+
 Bakery::Bakery() {
 	this->set_card("Bakery", 1, 1, 2, 3, Icon::bread, Color::green);
 	this->set_multiplier_icon(Icon::none);
@@ -41,6 +46,6 @@ FurnitureFactory::FurnitureFactory() {
 }
 
 FruitAndVegetableMarket::FruitAndVegetableMarket() {
-	this->set_card("FruitAndVegetableMarket", 1, 1, 11, 12, Icon::bread, Color::green);
+	this->set_card("FruitAndVegetableMarket", 2, 2, 11, 12, Icon::bread, Color::green);
 	this->set_multiplier_icon(Icon::grain);
 }

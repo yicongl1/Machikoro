@@ -8,6 +8,7 @@ class GreenCard : public Card {
 public:
 	virtual void action(Bank *p1, Bank *p2, Card *c1, Card *c2, int val);
 	void set_multiplier_icon(Icon icon);
+	Icon get_multiplier_icon();
 private:
 	Icon multiplier = Icon::none;
 };

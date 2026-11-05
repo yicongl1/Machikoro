@@ -85,7 +85,7 @@ string Card::get_string_color()
 	switch (this->get_color())
 	{
 	case Color::blue:
-		return "blue";
+		return "bleu";
 	case Color::green:
 		return "vert";
 	case Color::red:
@@ -95,4 +95,5 @@ string Card::get_string_color()
 	case Color::yellow:
 		return "jaune";
 	}
+	return "inconnu";
 }

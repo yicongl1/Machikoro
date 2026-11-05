@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <random>
+#include <type_traits>
 #include <ctime>
 #include "Deck.h"
 
@@ -47,11 +49,6 @@ Deck::Deck()
 
 void Deck::shuffle()
 {
-	srand(unsigned(std::time(0)));
-	random_shuffle(this->deck.begin(), this->deck.end());
-	random_shuffle(this->deck.begin(), this->deck.end());
-	random_shuffle(this->deck.begin(), this->deck.end());
-	random_shuffle(this->deck.begin(), this->deck.end());
-	random_shuffle(this->deck.begin(), this->deck.end());
-	random_shuffle(this->deck.begin(), this->deck.end());
+	std::mt19937 rng(static_cast<unsigned int>(std::time(nullptr)));
+	std::shuffle(this->deck.begin(), this->deck.end(), rng);
 }

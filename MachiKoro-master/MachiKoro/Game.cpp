@@ -1,59 +1,232 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include <iomanip>
 #include <string>
 #include <sstream>
-#include "Game.h"
 #include <regex>
+#include <cstdlib>
+#include "Game.h"
 
 Game* Game::instance = NULL;
 using namespace std;
 
+namespace {
+
+	vector<string> split(string str)//通过空格键分开字符串
+	{
+		stringstream ss(str);
+		string item;
+		vector<string> tokens;
+		while (getline(ss, item, ' ')) {
+			tokens.push_back(item);
+		}
+		return tokens;
+	}
+
+	// 去掉首尾空白，并把连续空白压成一个空格
+	string normalize(string str)
+	{
+		string result;
+		bool pending_space = false;
+		for (size_t i = 0; i < str.size(); i++)
+		{
+			char c = str[i];
+			if (c == ' ' || c == '\t' || c == '\r' || c == '\n')
+			{
+				pending_space = true;
+				continue;
+			}
+			if (pending_space && !result.empty()) result += ' ';
+			pending_space = false;
+			result += c;
+		}
+		return result;
+	}
+
+	bool parse_int(const string& str, int& value)
+	{
+		try
+		{
+			size_t pos = 0;
+			int parsed = stoi(str, &pos);
+			if (pos != str.size()) return false;
+			value = parsed;
+			return true;
+		}
+		catch (...)
+		{
+			return false;
+		}
+	}
+
+	bool read_int_line(int& value)
+	{
+		string line;
+		if (!getline(cin, line)) return false;
+		return parse_int(normalize(line), value);
+	}
+
+	// 反复询问一个整数，输入 no 或 EOF 时返回 false
+	bool ask_int(const string& prompt, int& value)
+	{
+		while (true)
+		{
+			cout << prompt;
+			string line;
+			if (!getline(cin, line)) return false;
+			line = normalize(line);
+			if (line == "no") return false;
+			if (parse_int(line, value)) return true;
+			cout << "Choix invalide" << endl;
+		}
+	}
+
+	int color_size(player* p, int color)
+	{
+		if (color == 1) return (int)p->blue_cards.size();
+		if (color == 2) return (int)p->green_cards.size();
+		if (color == 3) return (int)p->red_cards.size();
+		return 0;
+	}
+
+	Card* color_card(player* p, int color, int index)
+	{
+		if (index < 0 || index >= color_size(p, color)) return nullptr;
+		if (color == 1) return p->blue_cards[index];
+		if (color == 2) return p->green_cards[index];
+		if (color == 3) return p->red_cards[index];
+		return nullptr;
+	}
+
+	Card* remove_color_card(player* p, int color, int index)
+	{
+		Card* card = color_card(p, color, index);
+		if (card == nullptr) return nullptr;
+		if (color == 1) p->blue_cards.erase(p->blue_cards.begin() + index);
+		else if (color == 2) p->green_cards.erase(p->green_cards.begin() + index);
+		else if (color == 3) p->red_cards.erase(p->red_cards.begin() + index);
+		return card;
+	}
+
+	void add_card(player* p, Card* card)
+	{
+		switch (card->get_color())
+		{
+		case Color::blue: p->blue_cards.push_back(static_cast<BlueCard*>(card)); break;
+		case Color::green: p->green_cards.push_back(static_cast<GreenCard*>(card)); break;
+		case Color::red: p->red_cards.push_back(static_cast<RedCard*>(card)); break;
+		case Color::purple: p->purple_cards.push_back(static_cast<PurpleCard*>(card)); break;
+		case Color::yellow: break;
+		}
+	}
+
+	vector<Card*> non_purple_cards(player* p)
+	{
+		vector<Card*> result;
+		for (size_t i = 0; i < p->blue_cards.size(); i++) result.push_back(p->blue_cards[i]);
+		for (size_t i = 0; i < p->green_cards.size(); i++) result.push_back(p->green_cards[i]);
+		for (size_t i = 0; i < p->red_cards.size(); i++) result.push_back(p->red_cards[i]);
+		return result;
+	}
+
+	void remove_card(player* p, Card* card)
+	{
+		if (card == nullptr) return;
+		if (card->get_color() == Color::blue)
+		{
+			for (size_t i = 0; i < p->blue_cards.size(); i++)
+				if (p->blue_cards[i] == card) { p->blue_cards.erase(p->blue_cards.begin() + i); return; }
+		}
+		else if (card->get_color() == Color::green)
+		{
+			for (size_t i = 0; i < p->green_cards.size(); i++)
+				if (p->green_cards[i] == card) { p->green_cards.erase(p->green_cards.begin() + i); return; }
+		}
+		else if (card->get_color() == Color::red)
+		{
+			for (size_t i = 0; i < p->red_cards.size(); i++)
+				if (p->red_cards[i] == card) { p->red_cards.erase(p->red_cards.begin() + i); return; }
+		}
+	}
+
+	void print_cards_of_player(player* p, const string& label)
+	{
+		cout << label << endl;
+		cout << "  bleu(1)  : ";
+		for (size_t i = 0; i < p->blue_cards.size(); i++)
+			cout << " |" << i << ": " << p->blue_cards[i]->get_name();
+		cout << endl;
+		cout << "  vert(2)  : ";
+		for (size_t i = 0; i < p->green_cards.size(); i++)
+			cout << " |" << i << ": " << p->green_cards[i]->get_name();
+		cout << endl;
+		cout << "  rouge(3) : ";
+		for (size_t i = 0; i < p->red_cards.size(); i++)
+			cout << " |" << i << ": " << p->red_cards[i]->get_name();
+		cout << endl;
+	}
+}
+
 Game::Game()
 {
 	this->d = new Deck();
-	this->slot_count = 0;
 	this->is_game_over = false;
-	this->version_old=this->choose_game();
+	this->version_old = this->choose_game();
 	this->turn = 0;
 	this->deal();
 	this->num_ai_player();
 }
 
-vector<string> split(string str)//通过空格键分开字符串
-{
-	stringstream ss(str);
-	string item;
-	vector<string> tokens;
-	while (getline(ss, item, ' ')) {
-		tokens.push_back(item);
-	}
-	return tokens;
-}
 void Game::num_ai_player()//创造人物，并初始化发送卡片（一个WheatField，一个Bakery）
 {
 	system("cls");//清屏
 	int num = 0;
-	int ai_num = 0;
-	cout << "the number of player:" << endl;
-	cin >> num;
-	if (num == 0)
+	while (true)
 	{
-		cout << "invalid number,please rewrite" << endl;
 		cout << "the number of player:" << endl;
-		cin >> num;
+		if (!read_int_line(num))
+		{
+			if (cin.eof()) { num = 1; break; }
+			cout << "invalid number, please rewrite" << endl;
+			continue;
+		}
+		if (num <= 0)
+		{
+			cout << "invalid number, please rewrite" << endl;
+			continue;
+		}
+		break;
 	}
-	cout << "the number of ai_player:" << endl;
-	cin >> ai_num;
+
+	int ai_num = 0;
+	while (true)
+	{
+		cout << "the number of ai_player (0-" << num << "):" << endl;
+		if (!read_int_line(ai_num))
+		{
+			if (cin.eof()) { ai_num = 0; break; }
+			cout << "invalid number, please rewrite" << endl;
+			continue;
+		}
+		if (ai_num < 0 || ai_num > num)
+		{
+			cout << "invalid number, please rewrite" << endl;
+			continue;
+		}
+		break;
+	}
+
 	for (int i = 1; i <= (num - ai_num); i++)
 	{
 		string name;
 		cout << "The " << i << " player's name is " << endl;
-		cin >> name;
+		getline(cin, name);
+		name = normalize(name);
+		if (name.empty()) name = "player" + to_string(i);
 		create_player(name);
 	}
 	for (int ai = 1; ai <= ai_num; ai++)
 	{
-		create_player("ai", true);
+		create_player("ai" + to_string(ai), true);
 	}
 }
 
@@ -63,20 +236,19 @@ bool Game::choose_game()
 	cout << "Voici deux versions de ce jeu" << endl << endl;
 	cout << "L'une est la version ORIGINE, l'autre la version DLC" << endl << endl;
 	cout << "Lequel voulez-vous jouer ? (origin/dlc)" << endl;
-	string cmds = "(origin)"
-		"|(dlc)";
-	regex view(cmds);//正则
+	regex view("(origin)|(dlc)");//正则
 	while (true)
 	{
 		string str;
-		getline(cin, str);
-		vector<string> input = split(str);//通过空格分开字符串，得到input[0]，input[1]
+		if (!getline(cin, str)) return true;
+		str = normalize(str);
 		if (!regex_match(str, view))
 		{
 			cout << "Commande inconnue" << endl;
+			continue;
 		}
-		else if (input[0] == "origin") return true;
-		else if (input[0] == "dlc") return false;
+		if (str == "origin") return true;
+		if (str == "dlc") return false;
 	}
 }
 
@@ -108,12 +280,13 @@ void Game::deal()//从桌面发牌到卡槽，卡槽中有十种卡牌
 	bool exists;
 	int slotnum = 10;
 	if (this->version_old) slotnum = 16;
-	while (this->d->deck.size() > 0 && this->slot.size() < slotnum)//桌面上有牌，并且自身卡槽还有剩余空间（小于十种）
+	while (this->d->deck.size() > 0 && (int)this->slot.size() < slotnum)//桌面上有牌，并且自身卡槽还有剩余空间（小于十种）
 	{
 		exists = false;
 		c = this->d->deck.back();
 		for (auto it = this->slot.begin(); it != this->slot.end(); it++)
 		{
+			if (it->empty()) continue;
 			if (c->get_name().compare((*it)[0]->get_name()) == 0)//判断抽卡是否出现重复种类，若重复添加进slot[i]
 			{
 				it->push_back(c);
@@ -127,7 +300,6 @@ void Game::deal()//从桌面发牌到卡槽，卡槽中有十种卡牌
 			vector<Card*> v;
 			v.push_back(c);
 			this->slot.push_back(v);
-			this->slot_count++;
 		}
 		this->d->deck.pop_back();
 	}
@@ -163,7 +335,7 @@ void print_card(Card* c)//打印卡片，setw限定格式
 	{
 		YellowCard* yc = dynamic_cast<YellowCard*>(c);
 		string ifactive;
-		if (yc->active == true)
+		if (yc != nullptr && yc->active == true)
 		{
 			ifactive = "possédé";
 		}
@@ -213,8 +385,9 @@ void Game::view_slot_cards(bool cls)//打印卡槽卡片
 		setw(5) << "slot" <<
 		setw(5) << "qty";
 	print_card_heading();
-	for (int i = 0; i < this->slot.size(); i++)
+	for (int i = 0; i < (int)this->slot.size(); i++)
 	{
+		if (this->slot[i].empty()) continue;
 		cout << left <<
 			setw(5) << i <<
 			setw(5) << this->slot[i].size();
@@ -226,6 +399,8 @@ void Game::view_slot_cards(bool cls)//打印卡槽卡片
 void Game::view_player_cards(int index, bool cls)//打印玩家卡片
 {
 	if (cls) system("cls");
+	if (index < 0 || index >= (int)this->players.size()) return;
+
 	for (int i = 0; i < 25; i++)cout << "-";
 	cout << "CARTES DE JOUEUR";
 	for (int i = 0; i < 25; i++)cout << "-";
@@ -253,150 +428,233 @@ int Game::player_input(string message)//玩家输入想要的操作
 	string cmds = "(no)"
 		"|(voir [0-9]+)"
 		"|(voir table)"
-		"|(acheter [0-9]*)"
+		"|(voir tableau)"
+		"|(acheter [0-9]+)"
 		"|(acheter TrainStation)"
 		"|(acheter ShoppingMall)"
 		"|(acheter AmusementPark)"
 		"|(acheter RadioTower)";
-	bool isRound1 = true;//用于计算AI购买次数
-	int slotnum = 9;
-	if (this->version_old)	slotnum = 14;
 	regex view(cmds);//正则
-	bool complete = false;
+
 	while (true)
 	{
 		string str;
 		if (this->players[this->turn]->isBot)
 		{
-			if (isRound1)
+			// AI 只在"买得起、且不是已拥有的紫卡"的选项里随机选择
+			player* p = this->players[this->turn];
+			vector<string> options;
+			for (int i = 0; i < (int)this->slot.size(); i++)
 			{
-				str = "acheter ";
-				srand(time(0));
-				str += to_string(rand() % slotnum);
-				cout << str << endl;
+				if (this->slot[i].empty()) continue;
+				Card* c = this->slot[i][0];
+				if (p->bank->get_coins() < c->get_cost()) continue;
+				if (c->get_color() == Color::purple)
+				{
+					bool owned = false;
+					for (int k = 0; k < (int)p->purple_cards.size(); k++)
+						if (p->purple_cards[k]->get_name() == c->get_name()) owned = true;
+					if (owned) continue;
+				}
+				options.push_back("acheter " + to_string(i));
 			}
-			else str = "no";
+
+			struct Major { int index; const char* name; };
+			const Major majors[] = {
+				{ player::TRAIN_STATION,  "TrainStation" },
+				{ player::SHOPPING_MALL,  "ShoppingMall" },
+				{ player::AMUSEMENT_PARK, "AmusementPark" },
+				{ player::RADIO_TOWER,    "RadioTower" }
+			};
+			for (const Major& m : majors)
+			{
+				YellowCard* yc = p->yellow_cards[m.index];
+				if (yc == nullptr || yc->active) continue;
+				if (p->bank->get_coins() < yc->get_cost()) continue;
+				options.push_back(string("acheter ") + m.name);
+			}
+
+			if (options.empty()) str = "no";
+			else str = options[rand() % options.size()];
+			cout << str << endl;
 		}
-		else getline(cin, str);
-		isRound1 = false;
+		else
+		{
+			if (!getline(cin, str)) return NO_PURCHASE;
+			str = normalize(str);
+		}
+
 		vector<string> input = split(str);//通过空格分开字符串，得到input[0]，input[1]
-		if (!regex_match(str, view))
+		if (input.empty() || !regex_match(str, view))
 		{
 			cout << "Commande inconnue" << endl;
-		}
-		else if (input[0] == "no") return -1;
-		else if (input[0] == "voir")
-		{
-			if (input[1] == "tableau") view_slot_cards(true);
-
-			else if (stoi(input[1]) > this->players.size() - 1)//stoi将string转为int
-			{
-				cout << "Il n'y a pas de joueur" << stoi(input[1]) << endl;
-				continue;
-			}
-			else view_player_cards(stoi(input[1]), true);
 			cout << message << endl;
+			continue;
 		}
-		else if (input[0] == "acheter" && input[1] == "TrainStation")
+
+		if (input[0] == "no") return NO_PURCHASE;
+
+		if (input[0] == "voir")
 		{
-			if (this->players[this->turn]->yellow_cards[0]->active)
+			if (input.size() < 2)
 			{
-				cout << "Vous l'avez deja" << endl;
+				cout << "Commande inconnue" << endl;
 				continue;
 			}
-			if (this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[0]->get_cost())
+			if (input[1] == "table" || input[1] == "tableau")
 			{
-				this->players[this->turn]->yellow_cards[0]->active = true;//TODO:cost money(qyb)
-				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[0]->get_cost());
-				return (this->players[this->turn]->bank->get_coins());
+				this->view_slot_cards(true);
 			}
 			else
 			{
-				cout << "Vous ne pouvez pas vous le permettre" << endl;
-				continue;
+				int index = 0;
+				if (!parse_int(input[1], index) || index < 0 || index >= (int)this->players.size())
+				{
+					cout << "Il n'y a pas de joueur " << input[1] << endl;
+				}
+				else
+				{
+					this->view_player_cards(index, true);
+				}
 			}
+			cout << message << endl;
+			continue;
 		}
-		else if (input[0] == "acheter" && input[1] == "ShoppingMall")
+
+		if (input[0] == "acheter")
 		{
-			if (this->players[this->turn]->yellow_cards[1]->active)
+			if (input.size() < 2)
 			{
-				cout << "Vous l'avez deja" << endl;
+				cout << "Commande inconnue" << endl;
 				continue;
 			}
-			if (this->players[this->turn]->yellow_cards[0]->active && this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[1]->get_cost())
+			const string& what = input[1];
+			if (what == "TrainStation")
 			{
-				this->players[this->turn]->yellow_cards[1]->active = true;//TODO:cost money(qyb)
-				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[1]->get_cost());
-
-				return (this->players[this->turn]->bank->get_coins());
+				if (this->buy_yellow(player::TRAIN_STATION)) return YELLOW_PURCHASE;
+				continue;
 			}
-			else
+			if (what == "ShoppingMall")
+			{
+				if (this->buy_yellow(player::SHOPPING_MALL)) return YELLOW_PURCHASE;
+				continue;
+			}
+			if (what == "AmusementPark")
+			{
+				if (this->buy_yellow(player::AMUSEMENT_PARK)) return YELLOW_PURCHASE;
+				continue;
+			}
+			if (what == "RadioTower")
+			{
+				if (this->buy_yellow(player::RADIO_TOWER)) return YELLOW_PURCHASE;
+				continue;
+			}
+
+			int index = 0;
+			if (!parse_int(what, index))
+			{
+				cout << "Commande inconnue" << endl;
+				continue;
+			}
+			if (index < 0 || index >= (int)this->slot.size() || this->slot[index].empty())
+			{
+				cout << "Pas de carte au numéro : " << index << endl;
+				continue;
+			}
+			if (this->players[this->turn]->bank->get_coins() < this->slot[index][0]->get_cost())
 			{
 				cout << "Vous ne pouvez pas vous le permettre" << endl;
 				continue;
 			}
+			return index;
 		}
-		else if (input[0] == "acheter" && input[1] == "AmusementPark")
-		{
-			if (this->players[this->turn]->yellow_cards[2]->active)
-			{
-				cout << "Vous l'avez deja" << endl;
-				continue;
-			}
-			if (this->players[this->turn]->yellow_cards[0]->active && this->players[this->turn]->yellow_cards[1]->active && this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[2]->get_cost())
-			{
-				this->players[this->turn]->yellow_cards[2]->active = true;//TODO:cost money(qyb)
-				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[2]->get_cost());
 
+		cout << "Commande inconnue" << endl;
+		cout << message << endl;
+	}
 
-				return (this->players[this->turn]->bank->get_coins());
-			}
-			else
-			{
-				cout << "Vous ne pouvez pas vous le permettre" << endl;
-				continue;
-			}
-		}
-		else if (input[0] == "acheter" && input[1] == "RadioTower")
-		{
-			if (this->players[this->turn]->yellow_cards[3]->active)
-			{
-				cout << "Vous l'avez deja" << endl;
-				continue;
-			}
-			if (this->players[this->turn]->yellow_cards[0]->active && this->players[this->turn]->yellow_cards[1]->active && this->players[this->turn]->yellow_cards[2]->active && this->players[this->turn]->bank->get_coins() >= this->players[this->turn]->yellow_cards[3]->get_cost())
-			{
-				this->players[this->turn]->yellow_cards[3]->active = true;//TODO:cost money(qyb)
-				this->players[this->turn]->bank->withdraw(this->players[this->turn]->yellow_cards[3]->get_cost());
+	return NO_PURCHASE;
+}
 
-				return (this->players[this->turn]->bank->get_coins());
-			}
-			else
-			{
-				cout << "Vous ne pouvez pas vous le permettre" << endl;
-				continue;
-			}
-		}
-		else if (input[0] == "acheter")
+bool Game::buy_yellow(int index)//购买大型建筑
+{
+	player* p = this->players[this->turn];
+	if (index < 0 || index >= (int)p->yellow_cards.size()) return false;
+	YellowCard* card = p->yellow_cards[index];
+	if (card == nullptr) return false;
+
+	if (card->active)
+	{
+		cout << "Vous l'avez deja" << endl;
+		return false;
+	}
+	// 四大建筑可以按任意顺序建造，没有前置条件
+	if (p->bank->get_coins() < card->get_cost())
+	{
+		cout << "Vous ne pouvez pas vous le permettre" << endl;
+		return false;
+	}
+
+	p->bank->withdraw(card->get_cost());
+	card->active = true;
+	cout << card->get_name() << " acheté ! Il vous reste "
+		<< p->bank->get_coins() << " pièces." << endl;
+	return true;
+}
+
+bool Game::buy_slot(int index)//购买卡槽中的普通建筑
+{
+	player* p = this->players[this->turn];
+	if (index < 0 || index >= (int)this->slot.size() || this->slot[index].empty())
+	{
+		cout << "Pas de carte au numéro : " << index << endl;
+		return false;
+	}
+
+	Card* card = this->slot[index].back();
+	// 紫卡不能重复拥有，必须在扣钱之前判断
+	if (card->get_color() == Color::purple)
+	{
+		for (int i = 0; i < (int)p->purple_cards.size(); i++)
 		{
-			if (stoi(input[1]) > this->slot.size())
+			if (p->purple_cards[i]->get_name() == card->get_name())
 			{
-				cout << "Pas de carte au numéro : " << stoi(input[1]) << endl;
-				continue;
+				cout << "Vous avez déjà cet établissement" << endl;
+				return false;
 			}
-			if (this->players[this->turn]->bank->get_coins() < this->slot[stoi(input[1])][0]->get_cost())
-			{
-				cout << "Vous ne pouvez pas vous le permettre" << endl;
-				continue;
-			}
-			if (stoi(input[1]) < this->slot.size() && this->players[this->turn]->bank->get_coins() >= this->slot[stoi(input[1])][0]->get_cost())
-			{
-				this->players[this->turn]->bank->withdraw(this->slot[stoi(input[1])][0]->get_cost());
-			}
-			return stoi(input[1]);
 		}
 	}
-	return 'a';
+	if (p->bank->get_coins() < card->get_cost())
+	{
+		cout << "Vous ne pouvez pas vous le permettre" << endl;
+		return false;
+	}
+
+	p->bank->withdraw(card->get_cost());
+	switch (card->get_color())
+	{
+	case Color::blue:
+		p->blue_cards.push_back(static_cast<BlueCard*>(card));
+		break;
+	case Color::green:
+		p->green_cards.push_back(static_cast<GreenCard*>(card));
+		break;
+	case Color::red:
+		p->red_cards.push_back(static_cast<RedCard*>(card));
+		break;
+	case Color::purple:
+		p->purple_cards.push_back(static_cast<PurpleCard*>(card));
+		break;
+	case Color::yellow:
+		break;
+	}
+
+	this->slot[index].pop_back();
+	if (this->slot[index].empty()) this->slot.erase(this->slot.begin() + index);
+
+	cout << card->get_name() << " acheté ! Il vous reste "
+		<< p->bank->get_coins() << " pièces." << endl;
+	return true;
 }
 
 void Game::roll_dice()//掷骰子主程序
@@ -407,40 +665,51 @@ void Game::roll_dice()//掷骰子主程序
 	this->view_player_cards(this->turn, false);//打印当前玩家卡片
 
 	int dice_count = 1;//默认骰子为1个
+	player* current = this->players[this->turn];
 
-	// Should be Train Station Card
-	if (this->players[this->turn]->yellow_cards[0]->active)
+	// 拥有火车站时可以选择 1 或 2 个骰子
+	if (current->yellow_active(player::TRAIN_STATION))
 	{
-		string d;
-		bool s = true;
-		cout << "1 ou 2 dés : ";
-		string cmds = "(1)"
-			"|(2)";
-		regex view(cmds);//正则
-		while (s)
+		if (current->isBot)
 		{
-			string str;
-			getline(cin, str);
-			vector<string> input = split(str);//通过空格分开字符串，得到input[0]，input[1]
-			if (!regex_match(str, view))
+			dice_count = 2;//AI 总是选择收益更高的两个骰子
+		}
+		else
+		{
+			while (true)
 			{
+				cout << "1 ou 2 dés : ";
+				string str;
+				if (!getline(cin, str)) { dice_count = 1; break; }
+				str = normalize(str);
+				if (str == "1") { dice_count = 1; break; }
+				if (str == "2") { dice_count = 2; break; }
 				cout << "Commande inconnue" << endl;
 			}
-			else if (input[0] == "1") { dice_count = atoi(str.c_str()); s = false; }
-			else if (input[0] == "2") { dice_count = atoi(str.c_str()); s = false; }
-			else
-				s = true;
 		}
 	}
 	this->rolling_dice(dice_count);
 
-	// Should be Radio Tower（如果有Radio Tower，可以重新掷骰子）
-	if (this->players[this->turn]->yellow_cards[3]->active)
+	// 拥有无线电塔时，每回合可以重掷一次
+	if (current->yellow_active(player::RADIO_TOWER))
 	{
-		cout << "Roulé un " << this->dice << ". Relancer (y/n) : ";
-		char response;
-		cin >> response;
-		if (response == 'y') this->rolling_dice(dice_count);
+		if (current->isBot)
+		{
+			if (this->dice <= 4)
+			{
+				this->rolling_dice(dice_count);
+				cout << "Radio Tower : relance -> " << this->dice << endl;
+			}
+		}
+		else
+		{
+			cout << "Roulé un " << this->dice << ". Relancer (y/n) : ";
+			string response;
+			if (!getline(cin, response)) response = "n";
+			response = normalize(response);
+			if (!response.empty() && (response[0] == 'y' || response[0] == 'Y'))
+				this->rolling_dice(dice_count);
+		}
 	}
 
 	cout << endl;
@@ -450,55 +719,60 @@ void Game::roll_dice()//掷骰子主程序
 	cout << "\n\n";
 	cout << "Joueur: " << this->turn << endl <<
 		"Roulé un: " << this->dice << endl <<
-		"Pièces de pré-règlement: " << this->players[this->turn]->bank->get_coins() << endl;
+		"Pièces de pré-règlement: " << current->bank->get_coins() << endl;
 	this->red_card_check();//先进行红卡的判定
 }
 
 void Game::red_card_check()//判断是否存在红色卡片，
 {
 	int tracker = this->turn - 1;
-	if (tracker < 0) tracker = this->players.size() - 1;
+	if (tracker < 0) tracker = (int)this->players.size() - 1;
 
 	while (tracker != this->turn)//对除自身之外其他玩家使用
 	{
-		for (int i = 0; i < this->players[tracker]->red_cards.size(); i++)
+		player* owner = this->players[tracker];
+		// Shopping Mall 是 yellow_cards[1]，不是 [2]
+		Card* mall = owner->yellow_active(player::SHOPPING_MALL)
+			? owner->yellow_cards[player::SHOPPING_MALL]
+			: nullptr;
+
+		for (int i = 0; i < (int)owner->red_cards.size(); i++)
 		{
-			if (this->dice <= this->players[tracker]->red_cards[i]->get_high_roll() &&
-				this->dice >= this->players[tracker]->red_cards[i]->get_low_roll())
+			RedCard* card = owner->red_cards[i];
+			if (this->dice <= card->get_high_roll() &&
+				this->dice >= card->get_low_roll())
 			{
-				Card* c = NULL;
-				// Should be Shopping Mall
-				if (this->players[tracker]->yellow_cards[2]->active) c = this->players[tracker]->red_cards[i];
-				this->players[tracker]->red_cards[i]->action(//action在继承类中重新定义，执行红卡扣钱操作
-					this->players[tracker]->bank,
+				card->action(//action在继承类中重新定义，执行红卡扣钱操作
+					owner->bank,
 					this->players[this->turn]->bank,
-					c,
-					NULL,
+					mall,
+					nullptr,
 					0
 				);
 			}
-			//if (this->players[i]->bank->get_coins() == 0) break;
 		}
-		tracker--;
-		if (tracker < 0) tracker = this->players.size() - 1;
 
+		tracker--;
+		if (tracker < 0) tracker = (int)this->players.size() - 1;
 	}
 	this->blue_card_check();//进行蓝卡的判定
 }
+
 void Game::blue_card_check()//对所有有此蓝卡玩家有效
 {
-	for (int i = 0; i < this->players.size(); i++)
+	for (int i = 0; i < (int)this->players.size(); i++)
 	{
-		for (int j = 0; j < this->players[i]->blue_cards.size(); j++)
+		for (int j = 0; j < (int)this->players[i]->blue_cards.size(); j++)
 		{
-			if (this->dice <= this->players[i]->blue_cards[j]->get_high_roll() &&
-				this->dice >= this->players[i]->blue_cards[j]->get_low_roll())
+			BlueCard* card = this->players[i]->blue_cards[j];
+			if (this->dice <= card->get_high_roll() &&
+				this->dice >= card->get_low_roll())
 			{
-				this->players[i]->blue_cards[j]->action(//action在继承类中重新定义
+				card->action(//action在继承类中重新定义
 					this->players[i]->bank,
-					NULL,
-					NULL,
-					NULL,
+					nullptr,
+					nullptr,
+					nullptr,
 					0
 				);
 			}
@@ -506,30 +780,35 @@ void Game::blue_card_check()//对所有有此蓝卡玩家有效
 	}
 	this->green_card_check();//进行绿卡的判定
 }
+
 void Game::green_card_check()//对自身有效
 {
-	for (int i = 0; i < this->players[this->turn]->green_cards.size(); i++)
+	player* p = this->players[this->turn];
+	Card* mall = p->yellow_active(player::SHOPPING_MALL)
+		? p->yellow_cards[player::SHOPPING_MALL]
+		: nullptr;
+
+	for (int i = 0; i < (int)p->green_cards.size(); i++)
 	{
-		if (this->dice <= this->players[this->turn]->green_cards[i]->get_high_roll() &&
-			this->dice >= this->players[this->turn]->green_cards[i]->get_low_roll())
+		GreenCard* card = p->green_cards[i];
+		if (this->dice <= card->get_high_roll() &&
+			this->dice >= card->get_low_roll())
 		{
-			Card* c = NULL;
-			// Should be Shopping Mall
-			if (this->players[this->turn]->yellow_cards[2]->active) c = this->players[this->turn]->red_cards[i];
 			int val = 0;
-			Icon icon = this->players[this->turn]->green_cards[i]->get_icon();
+			// 加成数量取决于卡牌的 multiplier 图标（牛/齿轮/谷物），不是卡牌自己的图标
+			Icon icon = card->get_multiplier_icon();
 			if (icon != Icon::none)
 			{
-				for (int j = 0; j < this->players[this->turn]->blue_cards.size(); j++)
+				for (int j = 0; j < (int)p->blue_cards.size(); j++)
 				{
-					if (icon == this->players[this->turn]->blue_cards[j]->get_icon()) val++;
+					if (icon == p->blue_cards[j]->get_icon()) val++;
 				}
 			}
-			this->players[this->turn]->green_cards[i]->action(//action在继承类中重新定义
-				this->players[this->turn]->bank,
-				NULL,
-				c,
-				NULL,
+			card->action(//action在继承类中重新定义
+				p->bank,
+				nullptr,
+				mall,
+				nullptr,
 				val
 			);
 		}
@@ -537,176 +816,192 @@ void Game::green_card_check()//对自身有效
 	this->purple_card_check();//进行紫卡的判定
 }
 
-// TODO: Refactor this. Especially the card swapping. It u-g-l-y
+void Game::tv_station_effect(TVStation* card)
+{
+	player* self = this->players[this->turn];
+	vector<int> targets;
+	for (int j = 0; j < (int)this->players.size(); j++)
+		if (j != this->turn) targets.push_back(j);
+	if (targets.empty()) return;
+
+	int target = -1;
+	if (self->isBot)
+	{
+		int best = -1;
+		for (int j : targets)
+		{
+			if (this->players[j]->bank->get_coins() > best)
+			{
+				best = this->players[j]->bank->get_coins();
+				target = j;
+			}
+		}
+	}
+	else
+	{
+		cout << "Prenez jusqu'à 5 pièces de : ";
+		for (int j : targets)
+			cout << j << ": " << this->players[j]->bank->get_coins() << " ";
+		cout << endl;
+		while (true)
+		{
+			if (!ask_int("Joueur (no pour annuler) : ", target)) return;
+			if (target != this->turn && target >= 0 && target < (int)this->players.size()) break;
+			cout << "Choix invalide" << endl;
+		}
+	}
+
+	if (target < 0) return;
+	card->action(self->bank, this->players[target]->bank, nullptr, nullptr, 0);
+	cout << "TV Station : " << this->turn << " prend 5 pièces (ou moins) à " << target << endl;
+}
+
+void Game::business_center_effect(BusinessCenter* card)
+{
+	player* self = this->players[this->turn];
+	vector<int> targets;
+	for (int j = 0; j < (int)this->players.size(); j++)
+	{
+		if (j == this->turn) continue;
+		if (!non_purple_cards(this->players[j]).empty()) targets.push_back(j);
+	}
+	if (targets.empty() || non_purple_cards(self).empty())
+	{
+		cout << "Aucun échange possible." << endl;
+		return;
+	}
+
+	if (self->isBot)
+	{
+		int target = targets[rand() % targets.size()];
+		vector<Card*> mine = non_purple_cards(self);
+		vector<Card*> theirs = non_purple_cards(this->players[target]);
+		Card* give = mine[rand() % mine.size()];
+		Card* take = theirs[rand() % theirs.size()];
+		remove_card(self, give);
+		remove_card(this->players[target], take);
+		add_card(self, take);
+		add_card(this->players[target], give);
+		cout << "Business Center : " << this->turn << " échange "
+			<< give->get_name() << " contre " << take->get_name()
+			<< " avec " << target << endl;
+		return;
+	}
+
+	for (int j : targets)
+		print_cards_of_player(this->players[j], "Joueur " + to_string(j) + " :");
+	print_cards_of_player(self, "Vos cartes :");
+	cout << "(Entrez 'no' pour annuler)" << endl;
+
+	int player_num = -1;
+	while (true)
+	{
+		if (!ask_int("Sélectionnez le joueur à échanger : ", player_num)) return;
+		if (player_num != this->turn && player_num >= 0 && player_num < (int)this->players.size()
+			&& !non_purple_cards(this->players[player_num]).empty())
+			break;
+		cout << "Choix invalide" << endl;
+	}
+
+	int take_color = 0;
+	while (true)
+	{
+		if (!ask_int("Couleur à prendre (1=bleu, 2=vert, 3=rouge) : ", take_color)) return;
+		if (take_color >= 1 && take_color <= 3
+			&& color_size(this->players[player_num], take_color) > 0) break;
+		cout << "Choix invalide" << endl;
+	}
+
+	int take_index = -1;
+	while (true)
+	{
+		if (!ask_int("Carte à prendre : ", take_index)) return;
+		if (take_index >= 0 && take_index < color_size(this->players[player_num], take_color)) break;
+		cout << "Choix invalide" << endl;
+	}
+
+	int give_color = 0;
+	while (true)
+	{
+		if (!ask_int("Couleur à donner (1=bleu, 2=vert, 3=rouge) : ", give_color)) return;
+		if (give_color >= 1 && give_color <= 3 && color_size(self, give_color) > 0) break;
+		cout << "Choix invalide" << endl;
+	}
+
+	int give_index = -1;
+	while (true)
+	{
+		if (!ask_int("Carte à donner : ", give_index)) return;
+		if (give_index >= 0 && give_index < color_size(self, give_color)) break;
+		cout << "Choix invalide" << endl;
+	}
+
+	Card* taken = remove_color_card(this->players[player_num], take_color, take_index);
+	Card* given = remove_color_card(self, give_color, give_index);
+	add_card(self, taken);
+	add_card(this->players[player_num], given);
+	cout << "Échange effectué : " << given->get_name()
+		<< " contre " << taken->get_name() << endl;
+}
+
 void Game::purple_card_check()
 {
-	for (int i = 0; i < this->players[this->turn]->purple_cards.size(); i++)
+	// Stadium / TV Station / Business Center 都只在骰出 6 时生效
+	if (this->dice == 6)
 	{
-		if (this->players[this->turn]->purple_cards[i]->get_name().compare("Stadium") == 0)
+		player* p = this->players[this->turn];
+		for (int i = 0; i < (int)p->purple_cards.size(); i++)
 		{
-			for (int j = 0; j < this->players.size(); j++)
+			Card* card = p->purple_cards[i];
+			if (Stadium* stadium = dynamic_cast<Stadium*>(card))
 			{
-				this->players[this->turn]->bank->deposit(this->players[j]->bank->withdraw(2));
-			}
-		}
-		if (this->players[this->turn]->purple_cards[i]->get_name().compare("TV Station") == 0)
-		{
-			cout << "Prenez jusqu'à 5 pièces de : ";
-			for (int j = 0; j < this->players.size(); j++)
-			{
-				cout << j << ": " << this->players[j]->bank->get_coins() << " ";
-			}
-			int player_num;
-			cin >> player_num;
-			this->players[this->turn]->bank->deposit(this->players[player_num]->bank->withdraw(5));
-		}
-		if (this->players[this->turn]->purple_cards[i]->get_name().compare("Business Center") == 0)
-		{
-			cout << "Échangez des cartes avec un joueur : " << endl;
-			for (int j = 0; j < this->players.size(); j++)
-			{
-				cout << "Joueur  : " << j << endl;
-				cout << "blue(1) : ";
-				for (int k = 0; i < this->players[j]->blue_cards.size(); k++)
+				int total = 0;
+				for (int j = 0; j < (int)this->players.size(); j++)
 				{
-					cout << " |" << k << ": " << this->players[j]->blue_cards[k]->get_name();
+					if (j == this->turn) continue;//不向自己收钱
+					int before = this->players[j]->bank->get_coins();
+					stadium->action(p->bank, this->players[j]->bank, nullptr, nullptr, 0);
+					total += before - this->players[j]->bank->get_coins();
 				}
-				cout << endl;
-				cout << "Vert(2) : ";
-				for (int k = 0; i < this->players[j]->green_cards.size(); k++)
-				{
-					cout << " |" << k << ": " << this->players[j]->green_cards[k]->get_name();
-				}
-				cout << endl;
-				cout << "Rouge(3) : ";
-				for (int k = 0; i < this->players[j]->red_cards.size(); k++)
-				{
-					cout << " |" << k << ": " << this->players[j]->red_cards[k]->get_name();
-				}
-				cout << endl;
+				cout << "Stadium : " << this->turn << " reçoit " << total
+					<< " pièces des autres joueurs." << endl;
 			}
-			int player_num;
-			int color_num;
-			int card_num;
-			cout << "Sélectionnez le joueur à prendre : ";
-			cin >> player_num;
-			cout << endl;
-
-			cout << "Sélectionnez la couleur à prendre : ";
-			cin >> color_num;
-			cout << endl;
-
-			cout << "Sélectionnez la carte à prendre : ";
-			cin >> card_num;
-			cout << endl;
-
-			if (color_num == 1)
+			else if (TVStation* tv = dynamic_cast<TVStation*>(card))
 			{
-				this->players[this->turn]->blue_cards.push_back(this->players[player_num]->blue_cards[card_num]);
-				this->players[player_num]->blue_cards.erase(this->players[player_num]->blue_cards.begin() + card_num);
+				this->tv_station_effect(tv);
 			}
-			else if (color_num == 2)
+			else if (BusinessCenter* bc = dynamic_cast<BusinessCenter*>(card))
 			{
-				this->players[this->turn]->green_cards.push_back(this->players[player_num]->green_cards[card_num]);
-				this->players[player_num]->green_cards.erase(this->players[player_num]->green_cards.begin() + card_num);
-			}
-			else
-			{
-				this->players[this->turn]->red_cards.push_back(this->players[player_num]->red_cards[card_num]);
-				this->players[player_num]->red_cards.erase(this->players[player_num]->red_cards.begin() + card_num);
-			}
-
-			cout << "Sélectionnez la couleur à donner : ";
-			cin >> color_num;
-			cout << endl;
-
-			cout << "Sélectionnez la carte à donner : ";
-			cin >> card_num;
-			cout << endl;
-
-			if (color_num == 1)
-			{
-				this->players[player_num]->blue_cards.push_back(this->players[this->turn]->blue_cards[card_num]);
-				this->players[this->turn]->blue_cards.erase(this->players[this->turn]->blue_cards.begin() + card_num);
-			}
-			else if (color_num == 2)
-			{
-				this->players[player_num]->green_cards.push_back(this->players[this->turn]->green_cards[card_num]);
-				this->players[this->turn]->green_cards.erase(this->players[this->turn]->green_cards.begin() + card_num);
-			}
-			else
-			{
-				this->players[player_num]->red_cards.push_back(this->players[this->turn]->red_cards[card_num]);
-				this->players[this->turn]->red_cards.erase(this->players[this->turn]->red_cards.begin() + card_num);
+				this->business_center_effect(bc);
 			}
 		}
 	}
 	this->buy_propery();//进入买卡操作
 }
 
-// TODO: Allow buying of property
 void Game::buy_propery()
 {
-	cout << "Pièces après règlement: " << this->players[this->turn]->bank->get_coins() << endl;
+	player* current = this->players[this->turn];
+	cout << "Pièces après règlement: " << current->bank->get_coins() << endl;
 	for (int i = 0; i < 70; i++)cout << "-";
 	cout << "\n\n";
-	cout << "Lequel voulez-vous acheter (no or 0-9 or TrainStation/ShoppingMall/AmusementPark/RadioTower)?" << endl;
-	int selection;
-	bool complete = false;
-	while (!complete)
+	string message = "Lequel voulez-vous acheter (no, un numéro de carte, ou TrainStation/ShoppingMall/AmusementPark/RadioTower)?";
+	cout << message << endl;
+
+	while (true)
 	{
-		selection = this->player_input("Lequel voulez-vous acheter (no or 0-9 or TrainStation/ShoppingMall/AmusementPark/RadioTower)?");//选择要买的卡号
-		cout << endl;
-		if (selection > 0)
+		int selection = this->player_input(message);//选择要买的卡号
+		if (selection == NO_PURCHASE) break;
+		if (selection == YELLOW_PURCHASE)
 		{
-			int select = selection;
-			if (Color::blue == this->slot[select][0]->get_color())//根据颜色对卡片进行分类加入玩家手中
-			{
-				this->players[this->turn]->blue_cards.push_back((BlueCard*)this->slot[select].back());//将卡槽中对应卡片加入到玩家手中
-				this->slot[select].pop_back();//丢出卡槽中的卡
-				complete = true;
-			}
-			else if (Color::green == this->slot[select][0]->get_color())
-			{
-				this->players[this->turn]->green_cards.push_back((GreenCard*)this->slot[select].back());
-				this->slot[select].pop_back();
-				complete = true;
-			}
-			else if (Color::red == this->slot[select][0]->get_color())
-			{
-				this->players[this->turn]->red_cards.push_back((RedCard*)this->slot[select].back());
-				this->slot[select].pop_back();
-				complete = true;
-			}
-			else if (Color::purple == this->slot[select][0]->get_color())
-			{
-				bool purp = true;
-				for (int i = 0; i < this->players[this->turn]->purple_cards.size(); i++)
-				{
-					if (this->slot[select].back()->get_name().compare(this->players[this->turn]->purple_cards[i]->get_name()) == 0)
-					{
-						cout << "Vous avez déjà cet établissement" << endl;
-						purp = false;
-					}
-				}
-				if (purp)
-				{
-					this->players[this->turn]->purple_cards.push_back((PurpleCard*)this->slot[select].back());
-					this->slot[select].pop_back();
-					complete = true;
-				}
-			}
-			else if (Color::yellow == this->slot[select][0]->get_color())//黄色卡片的购买还没有写，因为黄色卡片不是从卡槽中抽取，大家开局都有黄卡，但是状态不是active
-			{
-				//TODO: Implement buying mello yello(因为黄卡已经在玩家手上，所以这块不用做）
-			}
-			if (this->slot[select].size() == 0)
-			{
-				this->slot.erase(this->slot.begin() + select);
-			}
+			// 黄卡已在 player_input 中扣钱并激活；一回合只能建造一张
+			break;
 		}
-		else
+		if (selection < 0 || selection >= (int)this->slot.size()) continue;
+
+		if (this->buy_slot(selection))
 		{
+			// 一回合只能建造一张，购买成功后结束购买阶段
 			break;
 		}
 	}
@@ -716,9 +1011,10 @@ void Game::buy_propery()
 void Game::end_of_turn()//对是否结束进行判定，并且进入下一玩家回合
 {
 	this->is_game_over = true;
-	for (int i = 0; i < this->players[turn]->yellow_cards.size(); i++)
+	player* current = this->players[this->turn];
+	for (int i = 0; i < (int)current->yellow_cards.size(); i++)
 	{
-		if (!this->players[turn]->yellow_cards[i]->active)
+		if (!current->yellow_cards[i]->active)
 		{
 			this->is_game_over = false;
 			break;
@@ -728,16 +1024,25 @@ void Game::end_of_turn()//对是否结束进行判定，并且进入下一玩家
 	cout << "REGLEMENT ROND";
 	for (int i = 0; i < 25; i++)cout << "-";
 	cout << "\n\n";
-	if (this->is_game_over) { cout << this->turn << " wins" << endl; return; }//判断是否获胜
-	cout << "Fin du tour de " << this->turn << endl << "Pièces après l’achat: " << this->players[turn]->bank->get_coins();//打印本轮玩家所剩硬币
-	this->turn++;
-
-	// Should be Amusement Park card
-	if (this->players[this->turn - 1]->yellow_cards[2]->active)
+	if (this->is_game_over)
 	{
-		turn--;
+		cout << current->name << " (joueur " << this->turn << ") wins" << endl;//判断是否获胜
+		return;
 	}
-	if (this->turn == players.size()) this->turn = 0;
+	cout << "Fin du tour de " << this->turn << endl
+		<< "Pièces après l’achat: " << current->bank->get_coins();//打印本轮玩家所剩硬币
+
+	// 游乐园：只有掷出对子才额外获得一回合
+	bool extra_turn = current->yellow_active(player::AMUSEMENT_PARK)
+		&& this->dice1 == this->dice2;
+
+	this->turn++;
+	if (extra_turn)
+	{
+		this->turn--;
+		cout << endl << "Parc d'attractions : le joueur " << this->turn << " rejoue !";
+	}
+	if (this->turn >= (int)this->players.size()) this->turn = 0;
 	cout << endl << "Tour de " << this->turn << " après" << endl;//打印下轮玩家
 	return;
 }

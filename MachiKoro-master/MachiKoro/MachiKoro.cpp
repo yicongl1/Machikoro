@@ -2,33 +2,32 @@
 //
 #include "stdafx.h"
 #include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
 
-#include "Deck.h"
 #include "Game.h"
 
 using namespace std;
 
-void view_slots(Game *g)
-{
-	vector<vector<Card*>> s = g->get_slot();
-	for (int i = 0; i < s.size(); i++)
-	{
-		cout << i << ": " << s[i][0]->get_name() << ": " << s[i].size() << endl;
-	}
-}
-
-
 int main()
 {
-	while (!Game::getInstance()->is_game_over)
+	srand(static_cast<unsigned int>(time(nullptr)));
+
+	Game* game = Game::getInstance();
+	while (!game->is_game_over)
 	{
-		Game::getInstance()->roll_dice();
-		system("pause");
+		game->roll_dice();
+		if (!game->is_game_over)
+		{
+			cout << endl << "Appuyez sur Entrée pour continuer...";
+			string dummy;
+			if (!getline(cin, dummy)) break;
+		}
 	}
 
-
-	char t;
-	cin >> t;
-    return 0;
+	cout << endl << "Partie terminée. Appuyez sur Entrée pour quitter..." << endl;
+	string dummy;
+	getline(cin, dummy);
+	return 0;
 }
-

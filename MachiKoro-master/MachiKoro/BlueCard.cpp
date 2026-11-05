@@ -28,5 +28,5 @@ Mine::Mine()
 
 AppleOrchard::AppleOrchard()
 {
-	this->set_card("AppleOrchard", 2, 1, 10, 10, Icon::grain, Color::blue);
+	this->set_card("AppleOrchard", 3, 1, 10, 10, Icon::grain, Color::blue);
 }

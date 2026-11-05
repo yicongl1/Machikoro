@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 #include "Card.h"
 #include "Bank.h"
 #include "Deck.h"
@@ -9,6 +10,14 @@ using namespace std;
 
 class player {
 public:
+	// 四大建筑固定在 yellow_cards 中的位置
+	enum YellowSlot {
+		TRAIN_STATION = 0,
+		SHOPPING_MALL = 1,
+		AMUSEMENT_PARK = 2,
+		RADIO_TOWER = 3
+	};
+
 	bool isBot;
 	string name;
 	Bank* bank;
@@ -17,10 +26,22 @@ public:
 	vector<RedCard*> red_cards;
 	vector<PurpleCard*> purple_cards;
 	vector<YellowCard*> yellow_cards;
+
+	bool yellow_active(int index) const
+	{
+		return index >= 0 && index < (int)yellow_cards.size()
+			&& yellow_cards[index] != nullptr && yellow_cards[index]->active;
+	}
 };
 
 class Game {
 public:
+	// player_input 的返回值约定
+	enum PurchaseCode {
+		NO_PURCHASE = -1,      // 选择 no，结束购买
+		YELLOW_PURCHASE = -2   // 已成功购买一张大型建筑
+	};
+
 	Game();
 	int turn;
 	bool version_old;
@@ -55,7 +76,7 @@ public:
 	}
 	static Game* getInstance()
 	{
-		if (instance == NULL) {
+		if (instance == nullptr) {
 			instance = new Game();
 		}
 
@@ -68,7 +89,10 @@ private:
 	static Game* instance;
 	void rolling_dice(int dice_count);
 	int player_input(string message);
+	bool buy_yellow(int index);
+	bool buy_slot(int index);
+	void tv_station_effect(TVStation* card);
+	void business_center_effect(BusinessCenter* card);
 	vector<vector<Card*>> slot;
-	int slot_count;
 	Deck* d;
 };
