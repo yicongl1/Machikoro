@@ -74,13 +74,27 @@ MachiKoro 是一款骰子驱动的轻策略桌游。每名玩家初始拥有：
 
 ## 演示视频
 
-| 场景 | 时长 | 视频 |
-| --- | ---: | --- |
-| DLC 模式胜利 | 12 秒 | [▶ 观看](docs/demo/dlc_win.mp4) |
-| 起源模式胜利 | 16 秒 | [▶ 观看](docs/demo/origin_win.mp4) |
-| DLC 模式购买流程 | 59 秒 | [▶ 观看](docs/demo/dlc_buy.mp4) |
+> 以下视频通过 GitHub 附件（user-attachments）内嵌，点击播放即可。仓库内的 `docs/demo/*.mp4` 保留为离线/下载副本。
 
-> 点击链接后可在 GitHub 的文件页面播放/下载。较长或重复的原始录像（4 分钟起源模式、1 分钟 DLC 备份）放在 [`archive/videos/`](archive/videos/)，作为资料归档。
+### DLC 模式胜利（12 秒）
+
+https://github.com/user-attachments/assets/865f7009-6385-49b5-a4d9-4a2aadfd0271
+
+[下载原始 MP4](docs/demo/dlc_win.mp4)
+
+### 起源模式胜利（16 秒）
+
+https://github.com/user-attachments/assets/58274a0f-9507-4ad1-b976-fd4e3be2d2e2
+
+[下载原始 MP4](docs/demo/origin_win.mp4)
+
+### DLC 模式购买流程（59 秒）
+
+https://github.com/user-attachments/assets/3900ce41-a95b-427d-b455-19e44673f438
+
+[下载原始 MP4](docs/demo/dlc_buy.mp4)
+
+> 较长或重复的原始录像（4 分钟起源模式、1 分钟 DLC 备份）放在 [`archive/videos/`](archive/videos/)，作为资料归档。
 
 ---
 
