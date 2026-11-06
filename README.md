@@ -12,6 +12,9 @@
 
 - [项目简介](#项目简介)
 - [功能特性](#功能特性)
+- [项目亮点](#项目亮点)
+- [演示视频](#演示视频)
+- [课程笔记与归档](#课程笔记与归档)
 - [构建与运行](#构建与运行)
 - [目录结构](#目录结构)
 - [游戏规则速览](#游戏规则速览)
@@ -59,6 +62,37 @@ MachiKoro 是一款骰子驱动的轻策略桌游。每名玩家初始拥有：
 
 ---
 
+## 项目亮点
+
+- **完整的面向对象设计**：`Card` 抽象基类 + 五色卡继承体系，结算通过虚函数 `action()` 多态分发。
+- **设计模式实践**：`Game` 单例、`Deck` 集中创建（简单工厂思想）、`Game::iterator` 自定义迭代器、卡牌多态结算（类似 Strategy）。
+- **完整游戏规则**：15 种建筑 + 4 种地标，红/蓝/绿/紫四阶段结算，支持 1~N 名玩家与 AI 混合对局。
+- **防御式输入处理**：正则解析 + 单行输入 + 越界/买不起/重复紫卡校验，异常输入不会崩溃。
+- **工程化归档**：UML 设计图、课程笔记（Markdown + 原始 docx）、演示视频、旧版原型，完整保留项目演进过程。
+
+---
+
+## 演示视频
+
+| 场景 | 时长 | 视频 |
+| --- | ---: | --- |
+| DLC 模式胜利 | 12 秒 | [▶ 观看](docs/demo/dlc_win.mp4) |
+| 起源模式胜利 | 16 秒 | [▶ 观看](docs/demo/origin_win.mp4) |
+| DLC 模式购买流程 | 59 秒 | [▶ 观看](docs/demo/dlc_buy.mp4) |
+
+> 点击链接后可在 GitHub 的文件页面播放/下载。较长或重复的原始录像（4 分钟起源模式、1 分钟 DLC 备份）放在 [`archive/videos/`](archive/videos/)，作为资料归档。
+
+---
+
+## 课程笔记与归档
+
+- [课程笔记整理（Markdown）](docs/course-notes.md)：按 OOP、C++、UML、设计模式、STL、考点分类整理。
+- [原始课程笔记（docx）](archive/course-notes/课程笔记.docx)：完整原始文件，保留不动。
+- [旧版原型 v0.1](archive/legacy-v0.1/README.md)：2022-10 的早期实现，仅作版本演进记录。
+- [完整演示录像](archive/videos/)：较长的原始录屏，作为归档。
+
+---
+
 ## 构建与运行
 
 ### 方式一：Visual Studio
@@ -96,27 +130,40 @@ g++ -std=c++14 -I. Card.cpp Bank.cpp BlueCard.cpp GreenCard.cpp \
 
 ```text
 Machikoro/
-├─ MachiKoro-master/
+├─ MachiKoro-master/          # 当前可玩版本
 │  ├─ MachiKoro.sln
 │  └─ MachiKoro/
 │     ├─ MachiKoro.cpp        # 程序入口与主循环
 │     ├─ Game.h / Game.cpp    # 游戏流程、结算、购买、AI、输入解析
-│     ├─ Card.h / Card.cpp    # 卡牌抽象基类，保存名称/费用/收益/点数区间
+│     ├─ Card.h / Card.cpp    # 卡牌抽象基类
 │     ├─ BlueCard.*           # 蓝色卡（初级产业）
 │     ├─ GreenCard.*          # 绿色卡（二级产业）
 │     ├─ RedCard.*            # 红色卡（餐饮）
 │     ├─ PurpleCard.*         # 紫色卡（大型建筑）
-│     ├─ YellowCard.*         # 黄色卡（地标，玩家开局自带）
-│     ├─ Deck.h / Deck.cpp    # 牌堆：创建全部卡牌并洗牌
-│     ├─ Bank.h / Bank.cpp    # 玩家钱包（存取金币）
+│     ├─ YellowCard.*         # 黄色卡（地标）
+│     ├─ Deck.h / Deck.cpp    # 牌堆：集中创建全部卡牌并洗牌
+│     ├─ Bank.h / Bank.cpp    # 玩家钱包
 │     ├─ ColorAndIcon.h       # 颜色与图标枚举
 │     ├─ stdafx.*             # 预编译头
 │     └─ targetver.h
+├─ docs/
+│  ├─ demo/                   # README 展示用短视频
+│  │  ├─ origin_win.mp4
+│  │  ├─ dlc_win.mp4
+│  │  └─ dlc_buy.mp4
+│  └─ course-notes.md         # 课程笔记整理（Markdown）
+├─ archive/
+│  ├─ legacy-v0.1/            # 2022-10 旧版原型（仅源码入库）
+│  ├─ course-notes/           # 原始课程笔记 docx
+│  └─ videos/                 # 完整/备份录像
 ├─ cardImages/                # BMP 卡面素材（当前控制台版本未使用）
-├─ UML.vsdx / UML.pdf         # 早期 UML 设计图
+├─ UML.vsdx / UML.pdf         # UML 设计图
 ├─ UML_黑白.pdf
+├─ .gitignore                 # 忽略 VS 构建产物
 └─ README.md
 ```
+
+> `archive/legacy-v0.1/` 中保留了旧版原型的完整本地文件，但 `.vs/`、`x64/`、`*.obj`、`*.exe`、`*.pdb` 等构建产物已被 `.gitignore` 排除，不会提交到 GitHub。
 
 ---
 

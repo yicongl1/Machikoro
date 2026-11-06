@@ -1,0 +1,53 @@
+# ---- Visual Studio / MSBuild ----
+.vs/
+**/.vs/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+**/x64/
+**/x86/
+**/[Dd]ebug/
+**/[Rr]elease/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.obj
+*.pdb
+*.ilk
+*.idb
+*.ipch
+*.tlog
+*.log
+*.recipe
+*.lastbuildstate
+*.VC.db
+*.VC.VC.opendb
+*.sdf
+*.opensdf
+*.cache
+*.aps
+*.ncb
+*.exp
+*.lib
+*.dll
+*.exe
+
+# ---- Build output ----
+**/bin/
+**/obj/
+**/build/
+**/out/
+
+# ---- OS ----
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ---- Temporary test artifacts ----
+_smoke*
+_unit_test*
+
+# 如果最终决定不把演示视频放进仓库，取消下面这行注释即可
+# video/
