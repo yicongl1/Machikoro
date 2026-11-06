@@ -102,6 +102,8 @@ https://github.com/user-attachments/assets/3900ce41-a95b-427d-b455-19e44673f438
 
 - [课程笔记整理（Markdown）](docs/course-notes.md)：按 OOP、C++、UML、设计模式、STL、考点分类整理。
 - [原始课程笔记（docx）](archive/course-notes/课程笔记.docx)：完整原始文件，保留不动。
+- [UML 设计图](docs/uml/)：`UML.vsdx` / `UML.pdf` / `UML_黑白.pdf`。
+- [原始配置截图](archive/original-screenshots/)：未裁剪的 Gitee 配置截图，保留原始版本。
 - [旧版原型 v0.1](archive/legacy-v0.1/README.md)：2022-10 的早期实现，仅作版本演进记录。
 - [完整演示录像](archive/videos/)：较长的原始录屏，作为归档。
 
@@ -134,9 +136,11 @@ g++ -std=c++14 -I. Card.cpp Bank.cpp BlueCard.cpp GreenCard.cpp \
 
 ### 从 Gitee 拉取到 Visual Studio
 
-![1](messVS配置gitee_页面_1.png)
-![2](messVS配置gitee_页面_2.png)
-![3](messVS配置gitee_页面_3.png)
+![步骤 1-2：克隆仓库](docs/images/gitee/gitee-clone.png)
+![步骤 3-4：提交并推送](docs/images/gitee/gitee-commit.png)
+![步骤 5：推送成功](docs/images/gitee/gitee-push.png)
+
+> 以上为按内容裁剪后的版本；原始未裁剪截图保留在 [`archive/original-screenshots/`](archive/original-screenshots/)。
 
 ---
 
@@ -165,14 +169,21 @@ Machikoro/
 │  │  ├─ origin_win.mp4
 │  │  ├─ dlc_win.mp4
 │  │  └─ dlc_buy.mp4
+│  ├─ images/gitee/           # README 用的裁剪截图
+│  │  ├─ gitee-clone.png
+│  │  ├─ gitee-commit.png
+│  │  └─ gitee-push.png
+│  ├─ uml/                    # UML 设计图
+│  │  ├─ UML.vsdx
+│  │  ├─ UML.pdf
+│  │  └─ UML_黑白.pdf
 │  └─ course-notes.md         # 课程笔记整理（Markdown）
 ├─ archive/
 │  ├─ legacy-v0.1/            # 2022-10 旧版原型（仅源码入库）
 │  ├─ course-notes/           # 原始课程笔记 docx
+│  ├─ original-screenshots/   # 原始未裁剪截图
 │  └─ videos/                 # 完整/备份录像
 ├─ cardImages/                # BMP 卡面素材（当前控制台版本未使用）
-├─ UML.vsdx / UML.pdf         # UML 设计图
-├─ UML_黑白.pdf
 ├─ .gitignore                 # 忽略 VS 构建产物
 └─ README.md
 ```
@@ -386,6 +397,8 @@ classDiagram
     player --> Bank
     player --> Card
 ```
+
+> 更完整的 UML 图（含 Visio 源文件）见 [docs/uml/](docs/uml/)。
 
 ### 设计要点
 
