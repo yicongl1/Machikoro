@@ -85,11 +85,9 @@ https://github.com/user-attachments/assets/3900ce41-a95b-427d-b455-19e44673f438
 
 ---
 
-## 简历文案
+## 用于简历
 
-可直接复制到简历的项目描述、30 秒介绍和面试口述提纲见 **[docs/resume-project.md](docs/resume-project.md)**。
-
-> 当前按“团队项目”撰写；如果记不清具体分工，可以使用文档里的通用版表述。
+ **[docs/resume-project.md](docs/resume-project.md)**。
 
 ---
 
